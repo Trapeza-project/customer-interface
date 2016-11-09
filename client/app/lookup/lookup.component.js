@@ -6,43 +6,46 @@ const uiRouter = require('angular-ui-router');
 import routes from './lookup.routes';
 
 export class LookupComponent {
+	
+   personnumber = "yyyymmddxxxx";
+   purposestring = "Purpose with lookup";
+   datatypes = [];
+   chosendata = [];
+   admin = false;
+   modules = [];
+   UCHandling = true;
+   activeModule = {};
+   advancedOption = false;
+   price = 0;
   /*@ngInject*/
-  constructor($scope, $location, lookupService) {
-	/*$scope.personnumber = "yyyymmddxxxx";
-	$scope.purposestring = "Purpose with lookup"
-
-	$scope.datatypes = lookupService.getDataTypes();
-	$scope.chosendata = [];
-	$scope.admin = lookupService.isAdmin();
-	$scope.modules = lookupService.getActiveModules();
-	
-	
-	$scope.UCHandling = true;
-	
-	$scope.activeModule = {};
-	
-	$scope.advancedOption = false;
-	
-	$scope.price = 0;*/
+  constructor($location, lookupService) {
+	this.datatypes = lookupService.getDataTypes();
+	this.admin = lookupService.isAdmin();
+	this.modules = lookupService.getActiveModules();
   }
-	/*$scope.isModuleActive = function(){
-		if(Object.keys($scope.activeModule).length === 0 && $scope.activeModule.constructor === Object){
+  $onInit() {
+  }
+	isModuleActive() {
+		console.log("Is Module Active")
+		if(Object.keys(this.activeModule).length === 0 && this.activeModule.constructor === Object){
 			return true;
 		}else{
 			return false;
 		}
 	}
 	
-	$scope.setAdvancedOption = function(aOption){
-		$scope.advancedOption = aOption;
+	setAdvancedOption(aOption){
+		console.log("Set option");
+		this.advancedOption = aOption;
 	}
 	
-	$scope.updateData = function(chosendata){
-        $scope.chosendata = chosendata;
-		$scope.price = $scope.getPrice($scope.chosendata);
+	updateData(cdata){
+        this.chosendata = cdata;
+		this.price = getPrice(this.chosendata);
     }
 	
-	$scope.getPrice = function(data){
+	getPrice(data){
+		console.log("Get price");
 		var price = 0;
 		for(var i = 0; i < data.length;i++){
 			price = price + data[i].price;
@@ -50,43 +53,47 @@ export class LookupComponent {
 		return price;
 	}
 	
-	$scope.showMore = function(){
-		if($scope.admin && !$scope.advancedOption){
+	showMore(){
+		console.log("Show More");
+		if(this.admin && !this.advancedOption){
 			return true;
 		}else{
 			return false;
 		}
 	}
 	
-	$scope.showLess = function(){
-		if($scope.admin && $scope.advancedOption){
+	showLess(){
+		console.log("Show Less");
+		if(this.admin && this.advancedOption){
 			return true;
 		}else{
 			return false;
 		}
 	}
 	
-	$scope.toggleModule = function(module){
-		if(module==$scope.activeModule){
-			$scope.activeModule={};
-			$scope.UCHandling = true;
+	toggleModule(module){
+		console.log("toggle")
+		if(module==this.activeModule){
+			this.activeModule={};
+			this.UCHandling = true;
 		}else{
-			$scope.activeModule = module;
+			this.activeModule = module;
 			if(!module.UCHandle){
-				$scope.UCHandling = false;
+				this.UCHandling = false;
 			}else{
-				$scope.UCHandling = true;
+				this.UCHandling = true;
 			}
 		}
 	}
 	
-	$scope.isActiveModule = function(module){
-		if(module==$scope.activeModule){
+	isActiveModule(module){
+		console.log("Is Active Module")
+		if(module==this.activeModule){
 			return true;
 		}else{
 			return false;
 		}
-	}*/
+	}
 }
 
 export default angular.module('customerInterfaceApp.lookup', [uiRouter])

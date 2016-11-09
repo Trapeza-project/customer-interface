@@ -104,12 +104,35 @@ $fa-font-path: '/assets/fonts/font-awesome/';
 	margin:50px;
 }
 
+.headline-bg{
+	background: #ec971f;
+	border-radius: 6px 6px 0 0;
+	border: 2px solid #ec971f;
+	color:white;
+}
+
+.pricediv{
+	margin-top:20px;
+	margin-bottom:5px;
+	margin-left:5px;
+	margin-right:5px;
+	border: 1px solid #ec971f;
+	border-radius:5px;
+	color: #ec971f;
+	font-weight:bold;
+}
+
+.paddedmodule{
+	padding:15px;
+}
+
 // Component styles are injected through gulp
 /* inject:scss */
 @import 'activity/activity';
 @import 'actor/actor';
 @import 'admin/admin';
 @import 'lookup/lookup';
+@import 'lookupSettings/lookupSettings';
 @import 'main/main';
 @import 'request/request';
 @import '../components/footer/footer';

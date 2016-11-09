@@ -6,83 +6,94 @@ const uiRouter = require('angular-ui-router');
 import routes from './request.routes';
 
 export class RequestComponent {
+
+	requestid = 0;
+	requestdata = {};
+	history = [];
+	admin = false;
+	requesthtml="";
   /*@ngInject*/
-  constructor($scope,$location, lookupServiceService, modalService) {
-	/*$scope.requestid = lookupService.getCurrentRequestID();
-	$scope.requestdata = lookupService.getData($scope.requestid);
-	$scope.history = lookupService.getHistory($scope.requestdata.personid);
-	$scope.admin = lookupService.isAdmin();
-	$scope.requesthtml = lookupService.getRequestHTML($scope.requestid);*/
+  constructor($location, lookupService, modalService) {
+	this.$location = $location;
+	this.lookupService = lookupService;
+	this.modalService = modalService;
+	this.requestid = lookupService.getCurrentRequestID();
+	this.requestdata = lookupService.getData(this.requestid);
+	this.history = lookupService.getHistory(this.requestdata.personid);
+	this.admin = lookupService.isAdmin();
+	this.requesthtml = lookupService.getRequestHTML(this.requestid);
+  }
+  $onInit() {
   }
 
-	/*$scope.pendingrequest = function(){
-		if($scope.requestdata.access=="pending"){
+	pendingrequest(){
+		if(this.requestdata.access=="pending"){
 			return true;
 		}else{
 			return false;
 		}
 	}
-	$scope.approvedrequest = function(){
-		if($scope.requestdata.access=="approved"){
+	approvedrequest(){
+		if(this.requestdata.access=="approved"){
 			return true;
 		}else{
 			return false;
 		}
 	}
-	$scope.deniedrequest = function(){
-		if($scope.requestdata.access=="denied"){
+	deniedrequest(){
+		if(this.requestdata.access=="denied"){
 			return true;
 		}else{
 			return false;
 		}
 	}
 
-	$scope.pendingcompanyrequest = function(){
-		if($scope.requestdata.companystatus=="pending" && $scope.requestdata.access != "denied"){
+	pendingcompanyrequest(){
+		if(this.requestdata.companystatus=="pending" && this.requestdata.access != "denied"){
 			return true;
 		}else{
 			return false;
 		}
 	}
-	$scope.approvedcompanyrequest = function(){
-		if($scope.requestdata.companystatus=="approved" && $scope.requestdata.access != "denied"){
+	approvedcompanyrequest(){
+		if(this.requestdata.companystatus=="approved" && this.requestdata.access != "denied"){
 			return true;
 		}else{
 			return false;
 		}
 	}
-	$scope.deniedcompanyrequest = function(){
-		if($scope.requestdata.companystatus=="denied" || $scope.requestdata.access == "denied"){
-			return true;
-		}else{
-			return false;
-		}
-	}
-	
-	$scope.approvedlookupService = function(lookupService){
-		if(lookupService.access=="approved"){
-			return true;
-		}else{
-			return false;
-		}
-	}
-	$scope.deniedlookupService = function(lookupService){
-		if(lookupService.access== "denied"){
+	deniedcompanyrequest(){
+		if(this.requestdata.companystatus=="denied" || this.requestdata.access == "denied"){
 			return true;
 		}else{
 			return false;
 		}
 	}
 	
-	$scope.displayButton = function(){
-		if($scope.isAdmin() && $scope.requestdata.companystatus=="pending" && !$scope.requestdata.UCHandle){
+	approvedLookup(lookup){
+		if(lookup.access=="approved"){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	deniedLookup(lookup){
+		if(lookup.access== "denied"){
 			return true;
 		}else{
 			return false;
 		}
 	}
 	
-	$scope.approveRequest = function(){
+	displayButton(){
+		if(this.isAdmin() && this.requestdata.companystatus=="pending" && !this.requestdata.UCHandle){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	approveRequest(){
 		var modalOptions = {
 			closeButtonText: 'Cancel',
 			actionButtonText: 'Approve Request',
@@ -90,13 +101,13 @@ export class RequestComponent {
 			bodyText: 'Are you sure you want to approve this request?'
 		};
 
-		modalService.showModal({}, modalOptions)
+		this.modalService.showModal({}, modalOptions)
 			.then(function (result) {
-					 $scope.requestdata.companystatus="approved";
+					 this.requestdata.companystatus="approved";
 			});
 			
 	}
-	$scope.denyRequest = function(){
+	denyRequest(){
 		var modalOptions = {
 			closeButtonText: 'Cancel',
 			actionButtonText: 'Deny Request',
@@ -104,21 +115,21 @@ export class RequestComponent {
 			bodyText: 'Are you sure you want to deny this request?'
 		};
 
-		modalService.showModal({}, modalOptions)
+		this.modalService.showModal({}, modalOptions)
 			.then(function (result) {
-					 $scope.requestdata.companystatus="denied";
+					 this.requestdata.companystatus="denied";
 			});
 
 	}
 	
-	$scope.openActor = function(id){
-		lookupService.setActiveActorID(id);
-		$location.url('/actor');
+	openActor = function(id){
+		this.lookupService.setActiveActorID(id);
+		this.$location.url('/actor');
 	}
 	
-	$scope.isAdmin = function(){
-		return $scope.admin;
-	}*/
+	isAdmin(){
+		return this.admin;
+	}
 }
 
 export default angular.module('customerInterfaceApp.request', [uiRouter])

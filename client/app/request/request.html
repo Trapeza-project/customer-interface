@@ -7,73 +7,46 @@
 	</div>
 	<div class="container">
 		<div id="overviewinforequest">
-			<h2 class="weak-border-bottom text-orange">{{requestdata.name}} ({{requestdata.personid}})</h2>
+			<h2 class="weak-border-bottom text-orange">{{requestCtrl.requestdata.name}} ({{requestCtrl.requestdata.personid}})</h2>
 			<table class="requesttable">
 				<col width="50%">
 				<col width="50%">
 				<tr class="requesttr">
 					<td >
 						<h3>Request Purpose</h3>
-						<p class="inlineblock text-color">{{requestdata.purpose}}</p>
+						<p class="inlineblock text-color">{{requestCtrl.requestdata.purpose}}</p>
 					</td>
 					<td>
 						<h3>Request Time</h3>
-						<p class="inlineblock text-color">{{requestdata.timestamp}}</p>
+						<p class="inlineblock text-color">{{requestCtrl.requestdata.timestamp}}</p>
 					</td>
 				</tr>
 				<tr class="requesttr">
 					<td>
 						<h3>Request Access</h3>
 						<div>
-								<span ng-show="pendingrequest()" class="glyphicon glyphicon-hourglass"></span>
-								<span ng-show="approvedrequest()" class="glyphicon glyphicon-ok-circle"></span>
-								<span ng-show="deniedrequest()" class="glyphicon glyphicon-ban-circle"></span>
+								<span ng-show="requestCtrl.pendingrequest()" class="glyphicon glyphicon-hourglass"></span>
+								<span ng-show="requestCtrl.approvedrequest()" class="glyphicon glyphicon-ok-circle"></span>
+								<span ng-show="requestCtrl.deniedrequest()" class="glyphicon glyphicon-ban-circle"></span>
 						</div>
 					</td>
 					<td>
 						<h3>Request Approved</h3>
 						<div>
-								<span ng-show="pendingcompanyrequest()" class="glyphicon glyphicon-hourglass"></span>
-								<span ng-show="approvedcompanyrequest()" class="glyphicon glyphicon-ok-circle"></span>
-								<span ng-show="deniedcompanyrequest()" class="glyphicon glyphicon-ban-circle"></span>
+								<span ng-show="requestCtrl.pendingcompanyrequest()" class="glyphicon glyphicon-hourglass"></span>
+								<span ng-show="requestCtrl.approvedcompanyrequest()" class="glyphicon glyphicon-ok-circle"></span>
+								<span ng-show="requestCtrl.deniedcompanyrequest()" class="glyphicon glyphicon-ban-circle"></span>
 						</div>
 					</td>
 				</tr>
 			</table>
 		</div>
-		<div ng-if="isAdmin()">
+		<div ng-if="requestCtrl.isAdmin()">
 			<h3>Requested Information</h3>
-			<div id="reqinfodata" ng-bind-html="requesthtml">
-				<!-- <table class="requesttable">
-					<col width="33%">
-					<col width="33%">
-					<col width="33%">
-					<tr class="requesttr">
-						<td class="tableheadline requesttd">
-							Title
-						</td>
-						<td class="tableheadline horizontal-center requesttd">
-							Value
-						</td>
-						<td class="tableheadline floatright requesttd">
-							Latest Update
-						</td>
-					</tr>
-					<tr ng-repeat="data in requestdata.info" class="requesttr">
-						<td class="requesttd">
-							{{data.title}}
-						</td>
-						<td class="horizontal-center requesttd">
-							{{data.value}}
-						</td>
-						<td class="floatright requesttd">
-							{{data.timestamp}}
-						</td>
-					</tr>
-				</table> -->
+			<div id="reqinfodata" ng-bind-html="requestCtrl.requesthtml">
 			</div>
 		</div>
-		<div class="requesttable" ng-if="isAdmin()">
+		<div class="requesttable" ng-if="requestCtrl.isAdmin()">
 			<h3>Previous Lookups</h3>
 			<table class="requesttable">
 				<col width="25%">
@@ -94,9 +67,9 @@
 						Access
 					</td>
 				</tr>
-				<tr ng-repeat="lookup in history" class="requesttr">
+				<tr ng-repeat="lookup in requestCtrl.history" class="requesttr">
 					<td class="requesttd">
-						<a class="pointercursor" ng-click="openActor(lookup.actor.id)">{{lookup.actor.name}}</a>
+						<a class="pointercursor" ng-click="requestCtrl.openActor(lookup.actor.id)">{{lookup.actor.name}}</a>
 					</td>
 					<td class="horizontal-center requesttd text-color">
 						<p ng-repeat="data in lookup.info" class="inlineblock infotext">{{data}}</p>
@@ -105,17 +78,17 @@
 						{{lookup.timestamp}}
 					</td>
 					<td class="floatright requesttd">
-						<span ng-show="approvedlookup(lookup)" class="glyphicon glyphicon-ok-circle"></span>
-						<span ng-show="deniedlookup(lookup)" class="glyphicon glyphicon-ban-circle"></span>
+						<span ng-show="requestCtrl.approvedlookup(lookup)" class="glyphicon glyphicon-ok-circle"></span>
+						<span ng-show="requestCtrl.deniedlookup(lookup)" class="glyphicon glyphicon-ban-circle"></span>
 					</td>
 				</tr>
 			</table>
 		</div>
-		<div ng-if="displayButton()" class="horizontal-center bot-margin">
-			<button class="btn btn-success btn-lg btn-margin" ng-click="approveRequest()">
+		<div ng-if="requestCtrl.displayButton()" class="horizontal-center bot-margin">
+			<button class="btn btn-success btn-lg btn-margin" ng-click="requestCtrl.approveRequest()">
 				Approve
 			</button>
-			<button class="btn btn-danger btn-lg btn-margin" ng-click="denyRequest()">
+			<button class="btn btn-danger btn-lg btn-margin" ng-click="requestCtrl.denyRequest()">
 				Deny
 			</button>
 		</div>

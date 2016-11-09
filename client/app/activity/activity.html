@@ -26,7 +26,7 @@
 						Approved
 					</td>
 				</tr>
-				<tr ng-repeat="request in requests" class="requesttr" ng-click="viewRequest(request.requestid)">
+				<tr ng-repeat="request in activityCtrl.requests" class="requesttr" ng-click="activityCtrl.viewRequest(request.requestid)">
 					<td class="requesttd">
 						<p class="fontbold">{{request.name}}</p>
 						<p ng-repeat="data in request.info" class="inlineblock infotext text-color">{{data}}</p>
@@ -35,14 +35,14 @@
 						<p>{{request.timestamp}}</p>
 					</td>
 					<td class="horizontal-center requesttd">
-						<span ng-show="pendingrequest(request)" class="glyphicon glyphicon-hourglass"></span>
-						<span ng-show="approvedrequest(request)" class="glyphicon glyphicon-ok-circle"></span>
-						<span ng-show="deniedrequest(request)" class="glyphicon glyphicon-ban-circle"></span>
+						<span ng-show="activityCtrl.pendingrequest(request)" class="glyphicon glyphicon-hourglass"></span>
+						<span ng-show="activityCtrl.approvedrequest(request)" class="glyphicon glyphicon-ok-circle"></span>
+						<span ng-show="activityCtrl.deniedrequest(request)" class="glyphicon glyphicon-ban-circle"></span>
 					</td>
 					<td class="horizontal-center requesttd">
-						<span ng-show="pendingcompanyrequest(request)" class="glyphicon glyphicon-hourglass"></span>
-						<span ng-show="approvedcompanyrequest(request)" class="glyphicon glyphicon-ok-circle"></span>
-						<span ng-show="deniedcompanyrequest(request)" class="glyphicon glyphicon-ban-circle"></span>
+						<span ng-show="activityCtrl.pendingcompanyrequest(request)" class="glyphicon glyphicon-hourglass"></span>
+						<span ng-show="activityCtrl.approvedcompanyrequest(request)" class="glyphicon glyphicon-ok-circle"></span>
+						<span ng-show="activityCtrl.deniedcompanyrequest(request)" class="glyphicon glyphicon-ban-circle"></span>
 					</td>
 				</tr>
 			  </table>
@@ -69,7 +69,7 @@
 						Approved
 					</td>
 				</tr>
-				<tr ng-repeat="request in pending" class="requesttr" ng-click="viewRequest(request.requestid)">
+				<tr ng-repeat="request in activityCtrl.pending" class="requesttr" ng-click="activityCtrl.viewRequest(request.requestid)">
 					<td class="requesttd">
 						<p class="fontbold">{{request.name}}</p>
 						<p ng-repeat="data in request.info" class="inlineblock infotext text-color">{{data}}</p>
@@ -78,14 +78,14 @@
 						<p class="text-color">{{request.timestamp}}</p>
 					</td>
 					<td class="horizontal-center requesttd">
-						<span ng-show="pendingrequest(request)" class="glyphicon glyphicon-hourglass"></span>
-						<span ng-show="approvedrequest(request)" class="glyphicon glyphicon-ok-circle"></span>
-						<span ng-show="deniedrequest(request)" class="glyphicon glyphicon-ban-circle"></span>
+						<span ng-show="activityCtrl.pendingrequest(request)" class="glyphicon glyphicon-hourglass"></span>
+						<span ng-show="activityCtrl.approvedrequest(request)" class="glyphicon glyphicon-ok-circle"></span>
+						<span ng-show="activityCtrl.deniedrequest(request)" class="glyphicon glyphicon-ban-circle"></span>
 					</td>
 					<td class="horizontal-center requesttd">
-						<span ng-show="pendingcompanyrequest(request)" class="glyphicon glyphicon-hourglass"></span>
-						<span ng-show="approvedcompanyrequest(request)" class="glyphicon glyphicon-ok-circle"></span>
-						<span ng-show="deniedcompanyrequest(request)" class="glyphicon glyphicon-ban-circle"></span>
+						<span ng-show="activityCtrl.pendingcompanyrequest(request)" class="glyphicon glyphicon-hourglass"></span>
+						<span ng-show="activityCtrl.approvedcompanyrequest(request)" class="glyphicon glyphicon-ok-circle"></span>
+						<span ng-show="activityCtrl.deniedcompanyrequest(request)" class="glyphicon glyphicon-ban-circle"></span>
 					</td>
 				</tr>
 			  </table>
@@ -112,7 +112,7 @@
 						Approved
 					</td>
 				</tr>
-				<tr ng-repeat="request in answered" class="requesttr" ng-click="viewRequest(request.requestid)">
+				<tr ng-repeat="request in activityCtrl.answered" class="requesttr" ng-click="activityCtrl.viewRequest(request.requestid)">
 					<td class="requesttd">
 						<p class="fontbold">{{request.name}}</p>
 						<p ng-repeat="data in request.info" class="inlineblock infotext text-color">{{data}}</p>
@@ -121,14 +121,14 @@
 						<p class="text-color">{{request.timestamp}}</p>
 					</td>
 					<td class="horizontal-center requesttd">
-						<span ng-show="pendingrequest(request)" class="glyphicon glyphicon-hourglass"></span>
-						<span ng-show="approvedrequest(request)" class="glyphicon glyphicon-ok-circle"></span>
-						<span ng-show="deniedrequest(request)" class="glyphicon glyphicon-ban-circle"></span>
+						<span ng-show="activityCtrl.pendingrequest(request)" class="glyphicon glyphicon-hourglass"></span>
+						<span ng-show="activityCtrl.approvedrequest(request)" class="glyphicon glyphicon-ok-circle"></span>
+						<span ng-show="activityCtrl.deniedrequest(request)" class="glyphicon glyphicon-ban-circle"></span>
 					</td>
 					<td class="horizontal-center requesttd">
-						<span ng-show="pendingcompanyrequest(request)" class="glyphicon glyphicon-hourglass"></span>
-						<span ng-show="approvedcompanyrequest(request)" class="glyphicon glyphicon-ok-circle"></span>
-						<span ng-show="deniedcompanyrequest(request)" class="glyphicon glyphicon-ban-circle"></span>
+						<span ng-show="activityCtrl.pendingcompanyrequest(request)" class="glyphicon glyphicon-hourglass"></span>
+						<span ng-show="activityCtrl.approvedcompanyrequest(request)" class="glyphicon glyphicon-ok-circle"></span>
+						<span ng-show="activityCtrl.deniedcompanyrequest(request)" class="glyphicon glyphicon-ban-circle"></span>
 					</td>
 				</tr>
 			  </table>

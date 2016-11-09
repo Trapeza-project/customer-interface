@@ -6,35 +6,41 @@ const uiRouter = require('angular-ui-router');
 import routes from './activity.routes';
 
 export class ActivityComponent {
+	
+   requests = [];
+	pending = [];
+	answered = [];
   /*@ngInject*/
-  constructor($scope,$location, lookupService) {
-    /*$scope.requests = [{name:"Kalle Karlsson", info:["Income","Address"], timestamp:"01/01/2016", access:"pending", companystatus:"pending"},{name:"Stina Andersson", info:["Income","Address"], timestamp:"01/01/2016", access:"approved", companystatus:"approved"}, {name:"Eva Svensson", info:["Income","Address"], timestamp:"01/01/2016", access:"denied", companystatus:"approved"},{name:"Eva Andersson", info:["Income","Address"], timestamp:"01/01/2016", access:"approved", companystatus:"denied"},{name:"Eva Andersson", info:["Income","Address"], timestamp:"01/01/2016", access:"approved", companystatus:"pending"}];
-	$scope.pending = [];
-	$scope.answered = [];
-	for(var i = 0; i < $scope.requests.length; i++){
-		if($scope.requests[i].access == "pending"){
-			$scope.pending.push($scope.requests[i]);
+  constructor($location, lookupService) {
+	this.$location = $location;
+	this.lookupService = lookupService;
+    this.requests = [{name:"Kalle Karlsson", info:["Income","Address"], timestamp:"01/01/2016", access:"pending", companystatus:"pending"},{name:"Stina Andersson", info:["Income","Address"], timestamp:"01/01/2016", access:"approved", companystatus:"approved"}, {name:"Eva Svensson", info:["Income","Address"], timestamp:"01/01/2016", access:"denied", companystatus:"approved"},{name:"Eva Andersson", info:["Income","Address"], timestamp:"01/01/2016", access:"approved", companystatus:"denied"},{name:"Eva Andersson", info:["Income","Address"], timestamp:"01/01/2016", access:"approved", companystatus:"pending"}];
+	for(var i = 0; i < this.requests.length; i++){
+		if(this.requests[i].access == "pending"){
+			this.pending.push(this.requests[i]);
 		}else{
-			$scope.answered.push($scope.requests[i]);
+			this.answered.push(this.requests[i]);
 		}
-	}*/
+	}
+  }
+  $onInit() {
   }
   
-	/*$scope.pendingrequest = function(request){
+	pendingrequest(request){
 		if(request.access=="pending"){
 			return true;
 		}else{
 			return false;
 		}
 	}
-	$scope.approvedrequest = function(request){
+	approvedrequest(request){
 		if(request.access=="approved"){
 			return true;
 		}else{
 			return false;
 		}
 	}
-	$scope.deniedrequest = function(request){
+	deniedrequest(request){
 		if(request.access=="denied"){
 			return true;
 		}else{
@@ -42,21 +48,21 @@ export class ActivityComponent {
 		}
 	}
 	
-	$scope.pendingcompanyrequest = function(request){
+	pendingcompanyrequest(request){
 		if(request.companystatus=="pending" && request.access != "denied"){
 			return true;
 		}else{
 			return false;
 		}
 	}
-	$scope.approvedcompanyrequest = function(request){
+	approvedcompanyrequest(request){
 		if(request.companystatus=="approved" && request.access != "denied"){
 			return true;
 		}else{
 			return false;
 		}
 	}
-	$scope.deniedcompanyrequest = function(request){
+	deniedcompanyrequest(request){
 		if(request.companystatus=="denied" || request.access == "denied"){
 			return true;
 		}else{
@@ -64,10 +70,10 @@ export class ActivityComponent {
 		}
 	}
 	
-	$scope.viewRequest = function(requestid){
-		lookupService.setCurrentRequestID(requestid);
-		$location.url('/request');
-	}*/
+	viewRequest(requestid){
+		this.lookupService.setCurrentRequestID(requestid);
+		this.$location.url('/request');
+	}
 }
 
 export default angular.module('customerInterfaceApp.activity', [uiRouter])

@@ -48,3 +48,16 @@
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fb9e25', endColorstr='#ffc477',GradientType=0);
 	background-color:#fb9e25;
 }
+
+.html.md-default-theme, html, body.md-default-theme, body{
+	background-color:#ffffff;
+}
+
+.md-tabs.md-default-theme .md-tab.md-active, md-tabs .md-tab.md-active, md-tabs.md-default-theme .md-tab.md-active md-icon, md-tabs .md-tab.md-active md-icon, md-tabs.md-default-theme .md-tab.md-focused, md-tabs .md-tab.md-focused, md-tabs.md-default-theme .md-tab.md-focused md-icon, md-tabs .md-tab.md-focused md-icon{
+	color:#ec971f;
+}
+
+.md-tabs.md-default-theme md-ink-bar, md-tabs md-ink-bar{
+	color:#ec971f;
+	background:#ec971f;
+}

@@ -3,12 +3,11 @@ import uiRouter from 'angular-ui-router';
 import routing from './main.routes';
 
 export class MainController {
-	
+	usernameplaceholder = "Username";
+	passwordplaceholder = "Password";
   /*@ngInject*/
   constructor($http, $scope, socket) {
     this.$http = $http;
-	$scope.usernameplaceholder = "Username";
-	$scope.passwordplaceholder = "Password";
 
   }
 

@@ -4,7 +4,7 @@ const angular = require('angular');
 /*@ngInject*/
 export function lookupServiceService() {
 	// AngularJS will instantiate a singleton by calling "new" on this function
-var vm = this;
+	var vm = this;
 	vm.currentRequestID;
 	
 	vm.actorid = 0;

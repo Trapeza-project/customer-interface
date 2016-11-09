@@ -12,10 +12,10 @@
 			<div class="col-sm-12">
 			  <form class="form" name="form" ng-submit="vm.login(form)" novalidate>
 				<div class="form-group">
-				  <input type="username" name="username" class="form-control" placeholder='{{usernameplaceholder}}' ng-model="vm.user.username" required>
+				  <input type="username" name="username" class="form-control" placeholder='{{$ctrl.usernameplaceholder}}' ng-model="$ctrl.username" required>
 				</div>
 				<div class="form-group">
-				  <input type="password" name="password" class="form-control" ng-model="vm.user.password" placeholder='{{passwordplaceholder}}' required>
+				  <input type="password" name="password" class="form-control" ng-model="$ctrl.password" placeholder='{{$ctrl.passwordplaceholder}}' required>
 				</div>
 
 				<div class="form-group has-error">
