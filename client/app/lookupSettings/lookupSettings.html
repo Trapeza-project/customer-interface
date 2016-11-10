@@ -10,58 +10,67 @@
 			<h2 class="no-margin">Lookup Modules Settings</h2>
 		</div>
 		<div class="paddedmodule">
-			<div class="lookupmodule" ng-repeat="lookup in lookups">
+			<div class="lookupmodule" ng-repeat="lookup in lookupSettingsCtrl.lookups">
 				<div>
 					<div>
 						<md-switch ng-model="lookup.active" class="md-warn inlineblock vertical-center">
 							<p class="text-color" ng-if="lookup.active">Enabled</p>
 							<p class="text-color" ng-if="!lookup.active">Disabled</p>
 						</md-switch>
-						<span ng-if="lookup.customized" ng-click="editModule(lookup)" class="glyphicon glyphicon-edit inlineblock floatright vertical-center"></span>
+						<span ng-if="lookup.customized" ng-click="lookupSettingsCtrl.editModule(lookup)" class="glyphicon glyphicon-edit inlineblock floatright vertical-center"></span>
 					</div>
 					<md-switch ng-model="lookup.UCHandle" class="md-warn inlineblock vertical-center" ng-change="changeUCStatus(lookup)">
 						<p class="text-color" ng-if="lookup.UCHandle">UC judge the request</p>
 						<p class="text-color" ng-if="!lookup.UCHandle">We judge the request</p>
 					</md-switch>
-					<div ng-if="!isEditModule(lookup)">
+					<div ng-if="!lookupSettingsCtrl.isEditModule(lookup)">
 						<h3 class="text-orange">{{lookup.name}}</h3>
 						<p class="text-color">{{lookup.description}}</p>
 						<p class="text-orange weak-border-top" ng-repeat="info in lookup.info">{{info.name}}</p>
 						<div class="pricediv">
-							<p class="inlineblock">{{getPrice(lookup)}} SEK</p>
+							<p class="inlineblock">{{lookupSettingsCtrl.getPrice(lookup)}} SEK</p>
 							<p class="inlineblock text-color font-light"> per request</p> 
 						</div>
 					</div>
 				</div>
-				<div ng-if="isEditModule(lookup)" class="paddedmodule">
+				<div ng-if="lookupSettingsCtrl.isEditModule(lookup)" class="paddedmodule">
 					<form class="form" name="editform">
 						<label class="requestlabel text-orange">Edit Lookup</label>
 						<div class="form-group">
-						  <input type="text" name="editingname" class="form-control" placeholder='Name' ng-model="editingname" ng-change="setEditName(editingname)" required>
+						  <input type="text" name="editingname" class="form-control" placeholder='Name' ng-model="lookupSettingsCtrl.editingname" required>
 						</div>
-						<textarea class="form-control" ng-model="editingdescription" placeholder="{{descriptionplaceholder}}" ng-change="setEditDescription(editingdescription)"/>
+						<textarea class="form-control" ng-model="lookupSettingsCtrl.editingdescription" placeholder="{{lookupSettingsCtrl.descriptionplaceholder}}">
+						</textarea>
 						<div>
 							<div class="weak-border-bottom">
 								<h4 class="text-orange">Chosen Data</h4>
-								<p class="text-color" ng-if="emptyEditingData()">None</p>
-								<p class="text-color weak-border-top" ng-repeat="data in editingChosendata">{{data.name}}</p>
+								<p class="text-color" ng-if="lookupSettingsCtrl.emptyEditingData()">None</p>
+								<p class="text-color weak-border-top" ng-repeat="data in lookupSettingsCtrl.editingChosendata">{{data.name}}</p>
 							</div>
 							<div class="weak-border-bottom">
 								<h4 class="text-orange">Calculated Price</h4>
-								<p class="text-color">{{editingprice}} SEK</p>
+								<p class="text-color">{{lookupSettingsCtrl.calculatePrice(lookupSettingsCtrl.editingChosendata)}} SEK</p>
 							</div>
 						</div>
 						<div class="form-group">
 							<h4 class="text-orange">Data to request</h4>
 							<div class="dataselect">
-								<select chosen multiple class='form-control' data-placeholder-text-multiple="'Choose required data'" ng-model="editingChosenData" ng-options="data.name for data in datatypes" ng-change="updateEditingData(editingChosenData)" >
-								</select>
+								<isteven-multi-select    
+									input-model="lookupSettingsCtrl.editDatatypes"    
+									output-model="lookupSettingsCtrl.editingChosendata"
+									button-label="name"
+									item-label="name"
+									tick-property="ticked"
+									group-property="msGroup">
+								</isteven-multi-select>
+								<!--<select chosen multiple class='form-control' data-placeholder-text-multiple="'Choose required data'" ng-model="editingChosenData" ng-options="data.name for data in lookupSettingsCtrl.datatypes" ng-change="lookupSettingsCtrl.updateEditingData(editingChosenData)" >
+								</select>-->
 							</div>
 						</div>
-						<button class="btn btn-success btn-md" ng-click="changeModule(lookup)">
+						<button class="btn btn-success btn-md" ng-click="lookupSettingsCtrl.changeModule(lookup)">
 							Confirm
 						</button>
-						<button ng-click="deleteModule(lookup)" class="btn btn-danger btn-md">
+						<button ng-click="lookupSettingsCtrl.deleteModule(lookup)" class="btn btn-danger btn-md">
 							Delete
 						</button>
 					</form>
@@ -71,28 +80,37 @@
 				<form class="form" name="editform">
 					<label class="requestlabel text-orange">Customize Lookup</label>
 					<div class="form-group">
-					  <input type="text" name="name" class="form-control" placeholder='{{modulename}}' ng-model="name" required>
+					  <input type="text" name="name" class="form-control" placeholder='{{lookupSettingsCtrl.modulename}}' ng-model="lookupSettingsCtrl.name" required>
 					</div>
-					<textarea class="form-control" ng-model="description" placeholder="{{descriptionplaceholder}}"/>
+					<textarea class="form-control" ng-model="lookupSettingsCtrl.description" placeholder="{{lookupSettingsCtrl.descriptionplaceholder}}">
+					</textarea>
 					<div>
 						<div class="weak-border-bottom">
 							<h4 class="text-orange">Chosen Data</h4>
-							<p class="text-color" ng-if="emptyData()">None</p>
-							<p class="text-color weak-border-top" ng-repeat="data in chosendata">{{data.name}}</p>
+							<p class="text-color" ng-if="lookupSettingsCtrl.emptyData()">None</p>
+							<p class="text-color weak-border-top" ng-repeat="data in lookupSettingsCtrl.chosendata">{{data.name}}</p>
 						</div>
 						<div class="weak-border-bottom">
 							<h4 class="text-orange">Calculated Price</h4>
-							<p class="text-color">{{price}} SEK</p>
+							<p class="text-color">{{lookupSettingsCtrl.calculatePrice(lookupSettingsCtrl.chosendata)}} SEK</p>
 						</div>
 					</div>
 					<div class="form-group">
 						<h4 class="text-orange">Data to request</h4>
 						<div class="dataselect">
-							<select chosen multiple class='form-control' data-placeholder-text-multiple="'Choose required data'" ng-model="chosenData" ng-options="data.name for data in datatypes" ng-change="updateData(chosenData)" >
-							</select>
+							<isteven-multi-select    
+								input-model="lookupSettingsCtrl.datatypes"    
+								output-model="lookupSettingsCtrl.chosendata"
+								button-label="name"
+								item-label="name"
+								tick-property="ticked"
+								group-property="msGroup">
+							</isteven-multi-select>
+							<!--<select chosen multiple class='form-control' data-placeholder-text-multiple="'Choose required data'" ng-model="chosenData" ng-options="data.name for data in lookupSettingsCtrl.datatypes" ng-change="lookupSettingsCtrl.updateData(chosenData)" >
+							</select>-->
 						</div>
 					</div>
-				  <button ng-click="addModule()" class="btn btn-warning btn-lg" type="submit">
+				  <button ng-click="lookupSettingsCtrl.addModule()" class="btn btn-warning btn-lg" type="submit">
 					Add
 				  </button>
 				</form>

@@ -105,6 +105,16 @@ export class RequestComponent {
 			.then(function (result) {
 					 this.requestdata.companystatus="approved";
 			});
+		/*this.modalService.showModal({
+		  templateUrl: "app/modalService/modal.html",
+		  controller: RequestComponent
+		}).then(function(modal) {
+		  console.log(modal);
+		  modal.element.modal();
+		  modal.close.then(function(result) {
+			console.log(result);
+		  });
+		});*/
 			
 	}
 	denyRequest(){

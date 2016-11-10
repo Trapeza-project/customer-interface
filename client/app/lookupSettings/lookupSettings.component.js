@@ -6,89 +6,105 @@ const uiRouter = require('angular-ui-router');
 import routes from './lookupSettings.routes';
 
 export class LookupSettingsComponent {
+	name = "";
+	description="";
+	lookups = [];
+	id = 0;
+	modulename="Name of the lookup module";
+	descriptionplaceholder="Description of lookup module";
+	price = 0;
+	originaltypes = [];
+	datatypes = [];
+	editDatatypes = [];
+	chosendata = [];
+	editingModule = {};
+	editingname="";
+	editingdescription="";
+	editingprice=0;
+	editingChosendata=[];
+	
   /*@ngInject*/
-  constructor($scope, $location, lookupService) {
-	$scope.name = "";
-	$scope.description = "";
-	$scope.lookups = lookupService.getModules();
-	$scope.id = $scope.lookups[$scope.lookups.length-1].id + 1;
-	
-	$scope.modulename="Name of the lookup module";
-	$scope.descriptionplaceholder="Description of lookup module";
-	$scope.price = 0;
-	$scope.datatypes = lookupService.getDataTypes();
-	$scope.chosendata = [];
-	
-	$scope.editingModule = {};
-	$scope.editingname="";
-	$scope.editingdescription="";
-	$scope.editingprice=0;
-	$scope.editingChosendata=[];
+  constructor($location, lookupService) {
+	this.lookupService = lookupService;
+	this.lookups = lookupService.getModules();
+	this.id = this.lookups[this.lookups.length-1].id + 1;
+	this.originaltypes = lookupService.getDataTypes();
+	this.datatypes = JSON.parse(JSON.stringify(this.originaltypes));
+	this.editDatatypes = JSON.parse(JSON.stringify(this.originaltypes));
   }
   $onInit() {
   }
   
-	/*$scope.changeUCStatus = function(lookup){
-		lookupService.changeUCStatus(lookupService.id,lookupService.UCHandle);
+	changeUCStatus(lookup){
+		this.lookupService.changeUCStatus(lookup.id,lookup.UCHandle);
 	}
 	
-	$scope.editModule = function(module){
-		console.log("editmodule");
-		if(module==$scope.editingModule){
-			$scope.editingModule = {};
-			$scope.editingname="";
-			$scope.editingdescription="";
-			$scope.editingprice=0;
-			$scope.editingChosendata=[];
-			$scope.editingChosenData=[];
-			$scope.editing = false;
+	editModule(module){
+		if(module==this.editingModule){
+			this.editingModule = {};
+			this.editingname="";
+			this.editingdescription="";
+			this.editingprice=0;
+			this.editingChosendata=[];
+			//this.editingChosenData=[];
+			this.editing = false;
+			this.editDatatypes = JSON.parse(JSON.stringify(this.originaltypes));
 		}else{
-			$scope.editingModule = module;
-			$scope.editingname=module.name;
-			$scope.editingdescription=module.description;
-			$scope.editingprice=module.price;
-			$scope.editingChosendata=module.info;
-			$scope.editingChosenData=module.info;
-			$scope.editing = true;
+			this.editingModule = module;
+			this.editingname=module.name;
+			this.editingdescription=module.description;
+			this.editingprice=module.price;
+			this.editingChosendata=module.info;
+			//this.editingChosenData=module.info;
+			this.editing = true;
+			var temptypes = JSON.parse(JSON.stringify(this.originaltypes));
+			for(var i = 0; i < temptypes.length;i++){
+				for(var j = 0; j < this.editingChosendata.length;j++){
+					if(temptypes[i].name == this.editingChosendata[j].name){
+						temptypes[i].ticked = true;
+						break;
+					}
+				}
+			}
+			this.editDatatypes = temptypes;
 		}
 	}
 	
-	$scope.isEditModule = function(module){
-		if(module==$scope.editingModule){
+	isEditModule(module){
+		if(module==this.editingModule){
 			return true;
 		}else{
 			return false;
 		}
 	}
 	
-	$scope.updateEditingData = function(chosendata){
-		console.log("lol");
-        $scope.editingChosendata = chosendata;
-		$scope.editingprice = $scope.calculatePrice($scope.editingChosendata);
+	/*updateEditingData(chosendata){
+        this.editingChosendata = chosendata;
+		this.editingprice = this.calculatePrice(this.editingChosendata);
     }
 	
-	$scope.updateData = function(chosendata){
-        $scope.chosendata = chosendata;
-		$scope.price = $scope.calculatePrice($scope.chosendata);
-    }
+	updateData(chosendata){
+        this.chosendata = chosendata;
+		this.price = this.calculatePrice(this.chosendata);
+    }*/
 	
-	$scope.emptyData = function(){
-		if($scope.chosendata.length > 0){
+	emptyData(){
+		if(this.chosendata.length > 0){
 			return false;
 		}else{
 			return true;
 		}
 	}
 	
-	$scope.emptyEditingData = function(){
-		if($scope.editingChosendata.length > 0){
+	emptyEditingData(){
+		if(this.editingChosendata.length > 0){
 			return false;
 		}else{
 			return true;
 		}
 	}
 	
-	$scope.calculatePrice = function(data){
+	calculatePrice(data){
 		var price = 0;
 		for(var i = 0; i < data.length;i++){
 			price = price + data[i].price;
@@ -96,31 +112,30 @@ export class LookupSettingsComponent {
 		return price;
 	}
 	
-	$scope.addModule = function(){
-		console.log("addmodule");
+	addModule(){
 		var module = {};
-		module.name = $scope.name;
-		module.description = $scope.description;
-		module.price = $scope.price;
+		module.name = this.name;
+		module.description = this.description;
+		module.price = this.price;
 		module.customized = true;
 		module.active = true;
 		module.UCHandle = true;
 		module.info=[];
-		for(var i = 0; i < $scope.chosendata.length; i++){
-			module.info.push($scope.chosendata[i]);
+		for(var i = 0; i < this.chosendata.length; i++){
+			module.info.push(this.chosendata[i]);
 		}
-		module.id=$scope.id++;
-		console.log(module);
-		lookupService.addModule(module);
-		$scope.chosendata = [];
-		$scope.chosenData = [];
-		$scope.name = "";
-		$scope.description = "";
-		$scope.price = 0;
+		module.id=this.id++;
+		this.lookupService.addModule(module);
+		this.chosendata = [];
+		//this.chosenData = [];
+		this.name = "";
+		this.description = "";
+		this.price = 0;
+		this.datatypes = JSON.parse(JSON.stringify(this.originaltypes));
 	}
 	
-	$scope.getPrice = function(lookup){
-		var info = lookupService.info;
+	getPrice(lookup){
+		var info = lookup.info;
 		var price = 0;
 		for(var i = 0; i < info.length;i++){
 			price = price + info[i].price;
@@ -128,45 +143,35 @@ export class LookupSettingsComponent {
 		return price;
 	}
 	
-	$scope.changeModule = function(module){
-		console.log($scope.editingname);
-		module.name = $scope.editingname;
-		module.description = $scope.editingdescription;
-		module.price = $scope.editingprice;
+	changeModule(module){
+		module.name = this.editingname;
+		module.description = this.editingdescription;
+		module.price = this.editingprice;
 		module.customized = true;
 		module.info=[];
-		for(var i = 0; i < $scope.editingChosendata.length; i++){
-			module.info.push($scope.editingChosendata[i]);
+		for(var i = 0; i < this.editingChosendata.length; i++){
+			module.info.push(this.editingChosendata[i]);
 		}
-		console.log("changemodule");
-		console.log(module);
-		lookupService.changeModule(module);
-		$scope.editingChosendata = [];
-		$scope.editingChosenData = [];
-		$scope.editingname = "";
-		$scope.editingdescription = "";
-		$scope.editingprice = 0;
-		$scope.editingModule = {};
+		this.lookupService.changeModule(module);
+		this.editingChosendata = [];
+		//this.editingChosenData = [];
+		this.editingname = "";
+		this.editingdescription = "";
+		this.editingprice = 0;
+		this.editingModule = {};
+		this.editDatatypes = JSON.parse(JSON.stringify(this.originaltypes));
 	}
 	
-	$scope.deleteModule = function(module){
-		console.log("deletemodule");
-		lookupService.removeModule(module);
-		$scope.editingChosendata = [];
-		$scope.editingChosenData = [];
-		$scope.editingname = "";
-		$scope.editingdescription = "";
-		$scope.editingprice = 0;
-		$scope.editingModule = {};
+	deleteModule(module){
+		this.lookupService.removeModule(module);
+		this.editingChosendata = [];
+		//this.editingChosenData = [];
+		this.editingname = "";
+		this.editingdescription = "";
+		this.editingprice = 0;
+		this.editingModule = {};
+		this.editDatatypes = JSON.parse(JSON.stringify(this.originaltypes));
 	}
-	
-	$scope.setEditName = function(name){
-		$scope.editingname = name;
-	}
-	
-	$scope.setEditDescription = function(description){
-		$scope.editingdescription = description;
-	}*/
 }
 
 export default angular.module('customerInterfaceApp.lookupSettings', [uiRouter])

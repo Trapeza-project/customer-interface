@@ -2,19 +2,13 @@
 const angular = require('angular');
 
 /*@ngInject*/
-export function modalServiceService() {
+export function modalServiceService($uibModal) {
 	// AngularJS will instantiate a singleton by calling "new" on this function
-}
-
-export default angular.module('customerInterfaceApp.modalService', [])
-  .service('modalService', ['$uibModal',
-function ($uibModal) {
-
-    var modalDefaults = {
+	var modalDefaults = {
         backdrop: true,
         keyboard: true,
         modalFade: true,
-        templateUrl: '.modalService/modal.html'
+        templateUrl: 'modalService/modal.html'
     };
 
     var modalOptions = {
@@ -40,8 +34,16 @@ function ($uibModal) {
 
         //Map modal.html $scope custom properties to defaults defined in service
         angular.extend(tempModalOptions, modalOptions, customModalOptions);
-
         if (!tempModalDefaults.controller) {
+			/*tempModalDefaults.controller = function modalController(['$scope','$uibModalInstance', function($scope, $uibModalInstance) {
+					$scope.modalOptions = tempModalOptions;
+					$scope.modalOptions.ok = function (result) {
+						$uibModalInstance.close(result);
+					};
+					$scope.modalOptions.close = function (result) {
+						$uibModalInstance.dismiss('cancel');
+					};
+				}]);*/
             tempModalDefaults.controller = function ($scope, $uibModalInstance) {
                 $scope.modalOptions = tempModalOptions;
                 $scope.modalOptions.ok = function (result) {
@@ -52,7 +54,10 @@ function ($uibModal) {
                 };
             };
         }
-
         return $uibModal.open(tempModalDefaults).result;
     };
-}]).name;
+}
+
+export default angular.module('customerInterfaceApp.modalService', [])
+  .service('modalService',['$uibModal', modalServiceService])
+  .name;

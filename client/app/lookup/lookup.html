@@ -7,7 +7,7 @@
 		<div id="paddedlookup">
 		  <form class="form" name="form">
 				<div id="quick">
-					<div class="quickLookup" ng-repeat="module in modules">
+					<div class="quickLookup" ng-repeat="module in lookupCtrl.modules">
 						<div ng-if="!lookupCtrl.isActiveModule(module)" class="quickLookupModule" ng-click="lookupCtrl.toggleModule(module)">
 							<div class="weak-border-bottom">
 								<h3 class="text-orange">{{module.name}}</h3>
@@ -26,31 +26,38 @@
 				</div>
 				<label class="requestlabel">Personal identity number</label>
 				<div class="form-group" id="personnumberinput">
-				  <input type="username" name="personnumber" class="form-control" placeholder='{{$ctrl.personnumber}}' ng-disabled="lookupCtrl.isModuleActive()" ng-model="id" ng-minlength="12" maxlength="12" onkeypress='return event.charCode >= 48 && event.charCode <= 57' required>
+				  <input type="username" name="personnumber" class="form-control" placeholder='{{lookupCtrl.personnumber}}' ng-disabled="lookupCtrl.isModuleActive()" ng-model="id" ng-minlength="12" maxlength="12" onkeypress='return event.charCode >= 48 && event.charCode <= 57' required>
 				</div>
-				<div ng-if="!$ctrl.UCHandling"class="form-group">
+				<div ng-if="!lookupCtrl.UCHandling"class="form-group">
 				  <label class="requestlabel">Purpose</label>
-				  <input type="text" name="purpose" class="form-control" placeholder='{{$ctrl.purposestring}}' ng-model="purpose" required>
+				  <input type="text" name="purpose" class="form-control" placeholder='{{lookupCtrl.purposestring}}' ng-model="purpose" required>
 				</div>
 				<a class="pointercursor" ng-if="lookupCtrl.showMore()" ng-click="lookupCtrl.setAdvancedOption(true)">More</a>
 				<a class="pointercursor" ng-if="lookupCtrl.showLess()" ng-click="lookupCtrl.setAdvancedOption(false)">Less</a>
-				<div ng-if="advancedOption" class="form-group lookupselect">
+				<div ng-if="lookupCtrl.advancedOption" class="form-group lookupselect">
 					<label class="requestlabel">Data to request</label>
 					<div class="dataselect">
-						<select chosen multiple class='form-control' data-placeholder-text-multiple="'Choose required data'" ng-model="chosenData" ng-options="data.name for data in lookupCtrl.datatypes" ng-change="lookupCtrl.updateData(chosenData)" >
-						</select>
+							<isteven-multi-select    
+								input-model="lookupCtrl.datatypes"    
+								output-model="lookupCtrl.chosenInfo"
+								button-label="name"
+								item-label="name"
+								tick-property="ticked"
+								group-property="msGroup">
+							</isteven-multi-select>
+						<!--<select chosen multiple class='form-control' data-placeholder-text-multiple="'Choose required data'" ng-model="chosenData" ng-options="data.name for data in lookupCtrl.datatypes" ng-change="lookupCtrl.updateData(chosenData)" >
+						</select>-->
 					</div>
-					<div class="pricediv">{{price}} SEK</div>
+					<div class="pricediv">{{lookupCtrl.getPrice(lookupCtrl.chosenInfo)}} SEK</div>
 				</div>
 			<div class="paddedmodule">
 			 <div class="form-group has-error">
 			  <p class="help-block" ng-show="form.personnumber.$error.personnumber && vm.submitted">
 				 Please enter the personal identity number.
 			  </p>
-
 			  <p class="help-block">{{ vm.errors.other }}</p>
 			</div>
-			  <button class="btn btn-warning btn-lg btn-login" type="submit">
+			  <button class="btn btn-warning btn-lg btn-login" type="submit" ng-click="lookupCtrl.submitLookup()">
 				Request
 			  </button>
 			</div>

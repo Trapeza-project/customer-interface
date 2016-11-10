@@ -6,11 +6,13 @@ import ngCookies from 'angular-cookies';
 import ngResource from 'angular-resource';
 import ngSanitize from 'angular-sanitize';
 import ngMaterial from 'angular-material';
-import ngLocalytics from 'angular-chosen-localytics';
+//import multiSelect from 'angular-chosen-localytics';
+//import jQuery from 'jquery';
 import 'angular-socket-io';
 
 import uiRouter from 'angular-ui-router';
 import uiBootstrap from 'angular-ui-bootstrap';
+//import multiSelect from 'isteven-multi-select';
 // import ngMessages from 'angular-messages';
 // import ngValidationMatch from 'angular-validation-match';
 
@@ -32,6 +34,7 @@ import actor from './actor/actor.component';
 import lookupService from './lookupService/lookupService.service';
 import modalService from './modalService/modalService.service';
 import lookupSettings from './lookupSettings/lookupSettings.component';
+import multiSelect from './isteven-multi-select/isteven-multi-select.directive'
 import constants from './app.constants';
 import util from '../components/util/util.module';
 import socket from '../components/socket/socket.service';
@@ -40,7 +43,7 @@ import socket from '../components/socket/socket.service';
 import './app.scss';
 
 var customerInterfaceApp = angular.module('customerInterfaceApp', [ngCookies, ngResource, ngSanitize, 'btford.socket-io',
-  ngMaterial, uiRouter, uiBootstrap, _Auth, lookupService, modalService, lookupSettings, account, lookup, request, activity, actor, admin, navbar, footer, main, constants, socket, util
+  multiSelect, ngMaterial, modalService, uiRouter, uiBootstrap, _Auth, lookupService, modalService, lookupSettings, account, lookup, request, activity, actor, admin, navbar, footer, main, constants, socket, util
 ])
   .config(routeConfig)
   .run(function($rootScope, $location, Auth) {

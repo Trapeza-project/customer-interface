@@ -102,10 +102,22 @@ export function lookupServiceService() {
 	
 	vm.getDataTypes = function(){
 		var datatypes = [];
-		var financialdata = {name:"Financial", price:5};
-		var educationaldata = {name:"Educational", price:10};
-		datatypes.push(financialdata);
-		datatypes.push(educationaldata);
+		var allCat = {name:"<strong>All Information</strong>", msGroup:true};
+		var financialCat = {name:"<strong>Financial</strong>", msGroup:true};
+		var income = {name:"Income", price:5, ticked:false};
+		var endFinancialCat = {msGroup:false};
+		var educationalCat = {name:"<strong>Educational</strong>", msGroup:true};
+		var degree = {name:"Degrees", price:10, ticked:false};
+		var endEducationalCat = {msGroup:false};
+		var endAllCat = {msGroup:false};
+		datatypes.push(allCat);
+		datatypes.push(financialCat);
+		datatypes.push(income);
+		datatypes.push(endFinancialCat);
+		datatypes.push(educationalCat);
+		datatypes.push(degree);
+		datatypes.push(endEducationalCat);
+		datatypes.push(endAllCat);
 		return datatypes;
 	}
 }

@@ -10,7 +10,8 @@ export class LookupComponent {
    personnumber = "yyyymmddxxxx";
    purposestring = "Purpose with lookup";
    datatypes = [];
-   chosendata = [];
+   //chosendata = [];
+   chosenInfo = [];
    admin = false;
    modules = [];
    UCHandling = true;
@@ -18,15 +19,20 @@ export class LookupComponent {
    advancedOption = false;
    price = 0;
   /*@ngInject*/
-  constructor($location, lookupService) {
+  constructor($scope, $location, lookupService) {
+	this.$scope = $scope;
 	this.datatypes = lookupService.getDataTypes();
 	this.admin = lookupService.isAdmin();
 	this.modules = lookupService.getActiveModules();
+	
   }
   $onInit() {
   }
+	submitLookup(){
+		console.log(this.chosenInfo);
+	}
+  
 	isModuleActive() {
-		console.log("Is Module Active")
 		if(Object.keys(this.activeModule).length === 0 && this.activeModule.constructor === Object){
 			return true;
 		}else{
@@ -35,14 +41,14 @@ export class LookupComponent {
 	}
 	
 	setAdvancedOption(aOption){
-		console.log("Set option");
 		this.advancedOption = aOption;
 	}
 	
-	updateData(cdata){
+	/**updateData(cdata){
+		console.log("UPPPPDATE");
         this.chosendata = cdata;
 		this.price = getPrice(this.chosendata);
-    }
+    }*/
 	
 	getPrice(data){
 		console.log("Get price");
@@ -54,7 +60,6 @@ export class LookupComponent {
 	}
 	
 	showMore(){
-		console.log("Show More");
 		if(this.admin && !this.advancedOption){
 			return true;
 		}else{
@@ -63,7 +68,6 @@ export class LookupComponent {
 	}
 	
 	showLess(){
-		console.log("Show Less");
 		if(this.admin && this.advancedOption){
 			return true;
 		}else{
@@ -72,7 +76,6 @@ export class LookupComponent {
 	}
 	
 	toggleModule(module){
-		console.log("toggle")
 		if(module==this.activeModule){
 			this.activeModule={};
 			this.UCHandling = true;
@@ -87,7 +90,6 @@ export class LookupComponent {
 	}
 	
 	isActiveModule(module){
-		console.log("Is Active Module")
 		if(module==this.activeModule){
 			return true;
 		}else{
