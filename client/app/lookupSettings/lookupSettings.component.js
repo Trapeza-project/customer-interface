@@ -24,13 +24,26 @@ export class LookupSettingsComponent {
 	editingChosendata=[];
 	
   /*@ngInject*/
-  constructor($location, lookupService) {
+  constructor($http, $location, lookupService) {
+	this.$http = $http;
 	this.lookupService = lookupService;
 	this.lookups = lookupService.getModules();
-	this.id = this.lookups[this.lookups.length-1].id + 1;
-	this.originaltypes = lookupService.getDataTypes();
-	this.datatypes = JSON.parse(JSON.stringify(this.originaltypes));
-	this.editDatatypes = JSON.parse(JSON.stringify(this.originaltypes));
+	var vm = this;
+	var updateLookups = function(){
+		vm.lookups = lookupService.getModules();
+	};
+	lookupService.registerObserverCallback(updateLookups);
+	
+	this.$http({
+     url: '/api/infotypes', 
+     method: "GET"  
+	}).then(response => {
+			if(response.status==200){
+				this.originaltypes = response.data.datatypes;
+				this.datatypes = JSON.parse(JSON.stringify(this.originaltypes));
+				this.editDatatypes = JSON.parse(JSON.stringify(this.originaltypes));
+			}
+		});
   }
   $onInit() {
   }
@@ -124,7 +137,7 @@ export class LookupSettingsComponent {
 		for(var i = 0; i < this.chosendata.length; i++){
 			module.info.push(this.chosendata[i]);
 		}
-		module.id=this.id++;
+		module.id=this.lookupService.nextID();
 		this.lookupService.addModule(module);
 		this.chosendata = [];
 		//this.chosenData = [];

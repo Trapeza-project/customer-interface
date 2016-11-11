@@ -26,11 +26,11 @@
 				</div>
 				<label class="requestlabel">Personal identity number</label>
 				<div class="form-group" id="personnumberinput">
-				  <input type="username" name="personnumber" class="form-control" placeholder='{{lookupCtrl.personnumber}}' ng-disabled="lookupCtrl.isModuleActive()" ng-model="id" ng-minlength="12" maxlength="12" onkeypress='return event.charCode >= 48 && event.charCode <= 57' required>
+				  <input type="username" name="personnumber" class="form-control" placeholder='{{lookupCtrl.personnumber}}' ng-disabled="!lookupCtrl.isModuleActive()" ng-model="id" ng-change="lookupCtrl.updateID(id)" maxlength="12" onkeypress='return event.charCode >= 48 && event.charCode <= 57' required>
 				</div>
 				<div ng-if="!lookupCtrl.UCHandling"class="form-group">
 				  <label class="requestlabel">Purpose</label>
-				  <input type="text" name="purpose" class="form-control" placeholder='{{lookupCtrl.purposestring}}' ng-model="purpose" required>
+				  <input type="text" name="purpose" class="form-control" placeholder='{{lookupCtrl.purposestring}}' ng-model="purpose" ng-change="lookupCtrl.updatePurpose(purpose)" required>
 				</div>
 				<a class="pointercursor" ng-if="lookupCtrl.showMore()" ng-click="lookupCtrl.setAdvancedOption(true)">More</a>
 				<a class="pointercursor" ng-if="lookupCtrl.showLess()" ng-click="lookupCtrl.setAdvancedOption(false)">Less</a>
@@ -57,7 +57,7 @@
 			  </p>
 			  <p class="help-block">{{ vm.errors.other }}</p>
 			</div>
-			  <button class="btn btn-warning btn-lg btn-login" type="submit" ng-click="lookupCtrl.submitLookup()">
+			  <button ng-disabled="lookupCtrl.buttonDisable()" class="btn btn-warning btn-lg btn-login" type="submit" ng-click="lookupCtrl.submitLookup()">
 				Request
 			  </button>
 			</div>

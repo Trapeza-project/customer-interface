@@ -9,6 +9,10 @@ import path from 'path';
 
 export default function(app) {
   // Insert routes below
+  app.use('/api/settings', require('./api/setting'));
+  app.use('/api/infotypes', require('./api/infotype'));
+  app.use('/api/actors', require('./api/actor'));
+  app.use('/api/requests', require('./api/request'));
   app.use('/api/things', require('./api/thing'));
   app.use('/api/users', require('./api/user'));
 

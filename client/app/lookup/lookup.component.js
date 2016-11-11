@@ -9,36 +9,75 @@ export class LookupComponent {
 	
    personnumber = "yyyymmddxxxx";
    purposestring = "Purpose with lookup";
+   id="";
+   purpose="";
    datatypes = [];
    //chosendata = [];
    chosenInfo = [];
-   admin = false;
    modules = [];
    UCHandling = true;
    activeModule = {};
    advancedOption = false;
    price = 0;
   /*@ngInject*/
-  constructor($scope, $location, lookupService) {
+  constructor($http, $scope, $location, lookupService, Auth) {
+	function temp(){
+		return true;
+	}
+	this.lookupService = lookupService;
+	this.isAdmin = temp;
+    //this.isAdmin = Auth.isAdminSync;
+	this.accessor = lookupService.getAccessor();
+	this.$http = $http;
 	this.$location = $location;
-	this.$scope = $scope;
-	this.datatypes = lookupService.getDataTypes();
-	this.admin = lookupService.isAdmin();
+	this.$http({
+     url: '/api/infotypes', 
+     method: "GET"  
+	}).then(response => {
+			if(response.status==200){
+				this.datatypes = response.data.datatypes;
+			}
+		});
 	this.modules = lookupService.getActiveModules();
 	
   }
   $onInit() {
   }
 	submitLookup(){
-		console.log(this.chosenInfo);
-		this.$location.url('/request');
+		var data = {};
+		var info = [];
+		var price = 0;
+		if(this.isModuleActive()){
+			for(var i = 0; i < this.activeModule.info.length; i++){
+				info.push(this.activeModule.info[i].id);
+				price = price + this.activeModule.info[i].price;
+			}
+		}else{
+			for(var i = 0; i < this.chosenInfo.length; i++){
+				info.push(this.chosenInfo[i].id);
+				price = price + this.chosenInfo[i].price;
+			}
+		}
+		
+		data.info = info;
+		data.id = this.id;
+		data.purpose = this.purpose;
+		data.price = price;
+		data.accessor = this.accessor;
+		this.$http.post('/api/requests', data)
+		.then(response => {
+			if(response.status==200){
+				this.lookupService.setCurrentRequestID(response.data.requestid);
+				this.$location.url('/request');
+			}
+		});
 	}
   
 	isModuleActive() {
 		if(Object.keys(this.activeModule).length === 0 && this.activeModule.constructor === Object){
-			return true;
-		}else{
 			return false;
+		}else{
+			return true;
 		}
 	}
 	
@@ -53,7 +92,6 @@ export class LookupComponent {
     }*/
 	
 	getPrice(data){
-		console.log("Get price");
 		var price = 0;
 		for(var i = 0; i < data.length;i++){
 			price = price + data[i].price;
@@ -62,7 +100,7 @@ export class LookupComponent {
 	}
 	
 	showMore(){
-		if(this.admin && !this.advancedOption){
+		if(this.isAdmin() && !this.advancedOption){
 			return true;
 		}else{
 			return false;
@@ -70,7 +108,7 @@ export class LookupComponent {
 	}
 	
 	showLess(){
-		if(this.admin && this.advancedOption){
+		if(this.isAdmin() && this.advancedOption){
 			return true;
 		}else{
 			return false;
@@ -97,6 +135,21 @@ export class LookupComponent {
 		}else{
 			return false;
 		}
+	}
+	
+	buttonDisable(){
+		if((Object.keys(this.activeModule).length === 0) || this.id.length != 12){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	updateID(id){
+		this.id = id;
+	}
+	updatePurpose(purpose){
+		this.purpose = purpose;
 	}
 }
 

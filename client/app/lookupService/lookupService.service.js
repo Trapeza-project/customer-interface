@@ -2,15 +2,47 @@
 const angular = require('angular');
 
 /*@ngInject*/
-export function lookupServiceService() {
+export function lookupServiceService($http) {
 	// AngularJS will instantiate a singleton by calling "new" on this function
 	var vm = this;
 	vm.currentRequestID;
 	
 	vm.actorid = 0;
+	vm.accessor = 10;
+	vm.id=0;
+	vm.modules = [];
 	
-	vm.modules = [{id:1, name:"Small", description:"Includes the basic information to the lookup.", info:[{name:"Income",price:5}], customized:false, active:true, UCHandle:true},{id:2, name:"Medium", description:"Includes the basic and personal information to the lookup.", info:[{name:"Income", price:5}, {name:"Address", price:10}], customized:false, active:true, UCHandle:true},{id:3, name:"Large", description:"Includes detailed information to the lookup.", info:[{name:"Income",price:5},{name:"Address", price:10},{name:"Criminal Record",price:20}], customized:false, active:true, UCHandle:true}];
+	$http({
+     url: '/api/settings/id', 
+     method: "GET",
+     params: {id: vm.accessor}  
+	}).then(response => {
+			if(response.status==200){
+				vm.modules = response.data.modules;
+				vm.id = vm.modules[vm.modules.length-1].id + 1;
+				vm.notifyObservers();
+			}
+		});
+		
+	  var observerCallbacks = [];
 
+	  this.registerObserverCallback = function(callback){
+		observerCallbacks.push(callback);
+	  };
+
+	  vm.notifyObservers = function(){
+		angular.forEach(observerCallbacks, function(callback){
+		  callback();
+		});
+	  };
+		
+	vm.nextID = function(){
+		return vm.id++;
+	}
+	
+	vm.getAccessor = function(){
+		return vm.accessor;
+	}
 	
 	vm.changeUCStatus = function(id, bool){
 		for(var i = 0; i < vm.modules.length; i++){
@@ -104,10 +136,10 @@ export function lookupServiceService() {
 		var datatypes = [];
 		var allCat = {name:"<strong>All Information</strong>", msGroup:true};
 		var financialCat = {name:"<strong>Financial</strong>", msGroup:true};
-		var income = {name:"Income", price:5, ticked:false};
+		var income = {name:"Income", id:1, price:5, ticked:false};
 		var endFinancialCat = {msGroup:false};
 		var educationalCat = {name:"<strong>Educational</strong>", msGroup:true};
-		var degree = {name:"Degrees", price:10, ticked:false};
+		var degree = {name:"Degrees", id:4, price:10, ticked:false};
 		var endEducationalCat = {msGroup:false};
 		var endAllCat = {msGroup:false};
 		datatypes.push(allCat);

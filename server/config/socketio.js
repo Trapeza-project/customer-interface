@@ -16,6 +16,10 @@ function onConnect(socket) {
   });
 
   // Insert sockets below
+  require('../api/setting/setting.socket').register(socket);
+  require('../api/infotype/infotype.socket').register(socket);
+  require('../api/actor/actor.socket').register(socket);
+  require('../api/request/request.socket').register(socket);
   require('../api/thing/thing.socket').register(socket);
 }
 

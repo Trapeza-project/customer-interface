@@ -12,7 +12,7 @@ export class RequestComponent {
 	history = [];
 	requesthtml="";
   /*@ngInject*/
-  constructor($location, lookupService, modalService, Auth) {
+  constructor($http, $location, lookupService, modalService, Auth) {
 	'ngInject';
 
 	function temp(){
@@ -20,14 +20,23 @@ export class RequestComponent {
 	}
 	this.isAdmin = temp;
     //this.isAdmin = Auth.isAdminSync;
-	  
+	this.$http = $http;
 	this.$location = $location;
 	this.lookupService = lookupService;
 	this.modalService = modalService;
 	this.requestid = lookupService.getCurrentRequestID();
-	this.requestdata = lookupService.getData(this.requestid);
-	this.history = lookupService.getHistory(this.requestdata.personid);
-	this.requesthtml = lookupService.getRequestHTML(this.requestid);
+	
+	this.$http({
+     url: '/api/requests/id', 
+     method: "GET",
+     params: {id: this.requestid}  
+	}).then(response => {
+			if(response.status==200){
+				this.requestdata = response.data.basic;
+				this.requesthtml = response.data.html;
+				this.history = response.data.history;
+			}
+		});
   }
   $onInit() {
   }

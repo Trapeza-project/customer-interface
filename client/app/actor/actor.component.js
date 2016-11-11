@@ -7,9 +7,19 @@ import routes from './actor.routes';
 
 export class ActorComponent {
   /*@ngInject*/
-  constructor($scope,$location,lookupService) {
-	$scope.actorid = lookupService.getActiveActorID();
-	$scope.actor = lookupService.getActor($scope.actorid);
+  constructor($http, $scope,$location,lookupService) {
+	this.$http = $http;
+	this.actorid = lookupService.getActiveActorID();
+	
+	this.$http({
+     url: '/api/actors/id', 
+     method: "GET",
+     params: {id: this.actorid}  
+	}).then(response => {
+			if(response.status==200){;
+				this.actor = response.data;
+			}
+		});
   }
   $onInit() {
   }
