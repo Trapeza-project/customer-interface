@@ -10,13 +10,9 @@ export class ActorComponent {
   constructor($scope,$location,lookupService) {
 	$scope.actorid = lookupService.getActiveActorID();
 	$scope.actor = lookupService.getActor($scope.actorid);
-	$scope.admin = true;
   }
   $onInit() {
   }
-  	/*$scope.isAdmin = function(){
-		return $scope.admin;
-	}*/
 }
 
 

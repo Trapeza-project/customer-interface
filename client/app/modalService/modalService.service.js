@@ -8,7 +8,7 @@ export function modalServiceService($uibModal) {
         backdrop: true,
         keyboard: true,
         modalFade: true,
-        templateUrl: 'modalService/modal.html'
+        templateUrl: '/app/modalService/modal.html'
     };
 
     var modalOptions = {
@@ -35,16 +35,7 @@ export function modalServiceService($uibModal) {
         //Map modal.html $scope custom properties to defaults defined in service
         angular.extend(tempModalOptions, modalOptions, customModalOptions);
         if (!tempModalDefaults.controller) {
-			/*tempModalDefaults.controller = function modalController(['$scope','$uibModalInstance', function($scope, $uibModalInstance) {
-					$scope.modalOptions = tempModalOptions;
-					$scope.modalOptions.ok = function (result) {
-						$uibModalInstance.close(result);
-					};
-					$scope.modalOptions.close = function (result) {
-						$uibModalInstance.dismiss('cancel');
-					};
-				}]);*/
-            tempModalDefaults.controller = function ($scope, $uibModalInstance) {
+            function tempCtrl ($scope, $uibModalInstance) {
                 $scope.modalOptions = tempModalOptions;
                 $scope.modalOptions.ok = function (result) {
                     $uibModalInstance.close(result);
@@ -53,6 +44,8 @@ export function modalServiceService($uibModal) {
                     $uibModalInstance.dismiss('cancel');
                 };
             };
+			tempCtrl.$inject = ["$scope", "$uibModalInstance"];
+			tempModalDefaults.controller = tempCtrl;
         }
         return $uibModal.open(tempModalDefaults).result;
     };

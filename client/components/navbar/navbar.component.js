@@ -13,9 +13,6 @@ export class NavbarComponent {
   },{
     title: 'Activity',
     state: 'activity'
-  },{
-    title: 'Admin Area',
-    state: 'lookupSettings'
   }];
 
   isCollapsed = true;

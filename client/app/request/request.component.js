@@ -10,17 +10,23 @@ export class RequestComponent {
 	requestid = 0;
 	requestdata = {};
 	history = [];
-	admin = false;
 	requesthtml="";
   /*@ngInject*/
-  constructor($location, lookupService, modalService) {
+  constructor($location, lookupService, modalService, Auth) {
+	'ngInject';
+
+	function temp(){
+		return true;
+	}
+	this.isAdmin = temp;
+    //this.isAdmin = Auth.isAdminSync;
+	  
 	this.$location = $location;
 	this.lookupService = lookupService;
 	this.modalService = modalService;
 	this.requestid = lookupService.getCurrentRequestID();
 	this.requestdata = lookupService.getData(this.requestid);
 	this.history = lookupService.getHistory(this.requestdata.personid);
-	this.admin = lookupService.isAdmin();
 	this.requesthtml = lookupService.getRequestHTML(this.requestid);
   }
   $onInit() {
@@ -100,22 +106,11 @@ export class RequestComponent {
 			headerText: 'Approve',
 			bodyText: 'Are you sure you want to approve this request?'
 		};
-
+		var vm = this;
 		this.modalService.showModal({}, modalOptions)
 			.then(function (result) {
-					 this.requestdata.companystatus="approved";
+					 vm.requestdata.companystatus="approved";
 			});
-		/*this.modalService.showModal({
-		  templateUrl: "app/modalService/modal.html",
-		  controller: RequestComponent
-		}).then(function(modal) {
-		  console.log(modal);
-		  modal.element.modal();
-		  modal.close.then(function(result) {
-			console.log(result);
-		  });
-		});*/
-			
 	}
 	denyRequest(){
 		var modalOptions = {
@@ -124,10 +119,10 @@ export class RequestComponent {
 			headerText: 'Deny',
 			bodyText: 'Are you sure you want to deny this request?'
 		};
-
+		var vm = this;
 		this.modalService.showModal({}, modalOptions)
 			.then(function (result) {
-					 this.requestdata.companystatus="denied";
+					 vm.requestdata.companystatus="denied";
 			});
 
 	}
@@ -135,10 +130,6 @@ export class RequestComponent {
 	openActor = function(id){
 		this.lookupService.setActiveActorID(id);
 		this.$location.url('/actor');
-	}
-	
-	isAdmin(){
-		return this.admin;
 	}
 }
 

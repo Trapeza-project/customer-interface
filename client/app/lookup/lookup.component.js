@@ -20,6 +20,7 @@ export class LookupComponent {
    price = 0;
   /*@ngInject*/
   constructor($scope, $location, lookupService) {
+	this.$location = $location;
 	this.$scope = $scope;
 	this.datatypes = lookupService.getDataTypes();
 	this.admin = lookupService.isAdmin();
@@ -30,6 +31,7 @@ export class LookupComponent {
   }
 	submitLookup(){
 		console.log(this.chosenInfo);
+		this.$location.url('/request');
 	}
   
 	isModuleActive() {
