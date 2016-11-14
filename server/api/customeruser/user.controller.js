@@ -95,7 +95,7 @@ export function changePassword(req, res) {
   var oldPass = String(req.body.oldPassword);
   var newPass = String(req.body.newPassword);
 
-  return User.find({
+  return CustomerUser.find({
     where: {
       _id: userId
     }
@@ -120,7 +120,7 @@ export function changePassword(req, res) {
 export function me(req, res, next) {
   var userId = req.user._id;
 
-  return User.find({
+  return CustomerUser.find({
     where: {
       _id: userId
     },
