@@ -6,7 +6,7 @@
 'use strict';
 import sqldb from '../sqldb';
 var Thing = sqldb.Thing;
-var User = sqldb.User;
+var User = sqldb.CustomerUser;
 
 Thing.sync()
   .then(() =>

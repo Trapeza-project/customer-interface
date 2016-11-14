@@ -1,15 +1,14 @@
 'use strict';
 
 export default function(sequelize, DataTypes) {
-  return sequelize.define('Infotype', {
-    _id: {
+  return sequelize.define('Infonames', {
+    infoid: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      autoIncrement: true
+	  primaryKey: true,
+      allowNull: false
     },
-    name: DataTypes.STRING,
-    info: DataTypes.STRING,
-    active: DataTypes.BOOLEAN
+    infoname: DataTypes.STRING,
+    infotype: DataTypes.STRING,
+	price: DataTypes.DOUBLE
   });
 }

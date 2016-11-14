@@ -12,6 +12,8 @@
 
 import jsonpatch from 'fast-json-patch';
 import {RequestLog} from '../../sqldb';
+import {PreviousRequest} from '../../sqldb';
+import {PendingRequest} from '../../sqldb';
 
 function respondWithResult(res, statusCode) {
   statusCode = statusCode || 200;
