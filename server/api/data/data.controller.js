@@ -15,6 +15,9 @@ import {Datalog} from '../../sqldb';
 import {FinancialData} from '../../sqldb';
 import {EducationalData} from '../../sqldb';
 import {BasicData} from '../../sqldb';
+import {Tablemapper} from '../../sqldb';
+import {RequestLog} from '../../sqldb';
+import {PreviousRequest} from '../../sqldb';
 
 function respondWithResult(res, statusCode) {
   statusCode = statusCode || 200;
@@ -66,35 +69,113 @@ function handleError(res, statusCode) {
   };
 }
 
-// Gets a list of Datas
+// Gets a list of the datalog
 export function index(req, res) {
-  return Data.findAll()
+  return Datalog.findAll({order: '"timestamp" DESC'})
     .then(respondWithResult(res))
     .catch(handleError(res));
 }
 
-// Gets a single Data from the DB
-export function show(req, res) {
-  return Data.find({
-    where: {
-      _id: req.params.id
-    }
-  })
-    .then(handleEntityNotFound(res))
-    .then(respondWithResult(res))
-    .catch(handleError(res));
+// Get the amount latest
+export function getuserlog(req, res) {
+	return Datalog.findAll({
+	   where: {
+		personid: req.params.id
+		},
+	  order: '"timestamp" DESC'
+	}).then(handleEntityNotFound(res))
+		.then(respondWithResult(res))
+		.catch(handleError(res));
 }
 
-// Creates a new Data in the DB
+// Get the amount latest
+export function getlatest(req, res) {
+	return Datalog.findAll({
+	  limit:req.params.amount,
+	  order: '"timestamp" DESC'
+	}).then(handleEntityNotFound(res))
+		.then(respondWithResult(res))
+		.catch(handleError(res));
+}
+
+// Get the amount latest
+export function getuserlatest(req, res) {
+	return Datalog.findAll({
+	   where: {
+		personid: req.params.id
+		},
+	  limit:req.params.amount,
+	  order: '"timestamp" DESC'
+	}).then(handleEntityNotFound(res))
+		.then(respondWithResult(res))
+		.catch(handleError(res));
+}
+
+// Creates or updates existing data
 export function createdata(req, res) {
-  return Data.create(req.body)
-    .then(respondWithResult(res, 201))
-    .catch(handleError(res));
+  var table;
+
+  Tablemapper.find({
+    where: {
+      infoid: req.body.infoid
+	}	
+	  }).then(function(res){
+		if(res.table == "Financials"){
+			table = FinancialData;
+		}else if(res.table == "Basics"){
+			table = BasicData;
+		}else if(res.table == "Educationals"){
+			table = EducationalData;
+		}else{
+			// Not found
+			return;
+		}
+		var column = res.column;
+		table.find({
+			where:{
+				personid:req.body.personid
+			}
+		}).on('success', function (person) {
+			// Check if record exists in db, and update
+			if (person) {
+				person.updateAttributes({
+					column: req.body.data
+				}).success(function(){
+						var entry = Datalog.build();
+						entry.setDataValue('personid', req.body.personid);
+						entry.setDataValue('infoid', req.body.infoid);
+						entry.setDataValue('provider', req.body.provider);
+						entry.setDataValue('selfupload', true);
+						entry.setDataValue('validation', req.body.validation);
+					  return entry.save()
+						.then(function() {
+						  res.json();
+						})
+						.catch(console.log("BAD"));
+				})
+			}
+		});
+			respondWithResult(res, 404);
+		});
 }
 
-export function createlog(req, res) {
-  return Data.create(req.body)
-    .then(respondWithResult(res, 201))
+export function getdata(req, res) {
+  var id = req.params.requestid;
+  
+  // Check if it is okay
+  var permitted = true;
+  
+  PreviousRequest.find({
+	  where:{
+		  requestid:id
+	  }
+	}).then(function(res){
+		if(permitted){
+			respondWithResult(res);
+		}else{
+			res.json({allow:permitted});
+		}
+	})
     .catch(handleError(res));
 }
 

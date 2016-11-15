@@ -4,7 +4,8 @@ export default function(sequelize, DataTypes) {
   return sequelize.define('Accessrights', {
     infoid: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      primaryKey: true
     },
     accessright:{ 
       type: DataTypes.ENUM('none','limited','all'),

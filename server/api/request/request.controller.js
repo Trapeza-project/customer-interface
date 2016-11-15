@@ -93,10 +93,61 @@ export function create(req, res) {
 	console.log(newRequest);
   return newRequest.save()
 	.then(function(request) {
-	  res.json({ requestid:request.requestid });
+	  var pendingRequest = PendingRequest.build();
+		pendingRequest.setDataValue('personid', req.body.id);
+		pendingRequest.setDataValue('accessid', req.body.accessor);
+		pendingRequest.setDataValue('infoids', JSON.stringify(req.body.info));
+		pendingRequest.setDataValue('requestid', request.requestid);
+		return pendingRequest.save()
+		.then(function(pending){
+			res.json({ requestid:pending.requestid });
+		}).catch(console.log("BAD"));
 	})
 	.catch(console.log("BAD"));
 }
+
+// Answers a request
+export function answerrequest(req, res) {
+	var id = req.body.requestid;
+	var approve = req.body.answer;
+	RequestLog.find({
+			where:{
+				requestid:id
+			}
+		}).on('success', function (request) {
+			// Check if record exists in db, and update
+			if (request) {
+				request.updateAttributes({
+					pending: false,
+					allow: approve
+				}).success(function(){
+					// Remove from pendingrequests
+					
+					PendingRequest.destroy({
+						where:{
+							requestid: id
+						}
+					}).then(function(request){
+							// Add to previousrequest
+							var prevRequest = PreviousRequest.build();
+							prevRequest.setDataValue('requestid', id);
+							prevRequest.setDataValue('infoids', request.infoids);
+							prevRequest.setDataValue('timetolive', 10);
+							prevRequest.setDataValue('allow', approve);
+							prevRequest.setDataValue('companyapprove', false);
+							prevRequest.setDataValue('companypending', false);
+							prevRequest.setDataValue('data', "<div></div>");
+							return prevRequest.save()
+							.then(function(prev){
+							res.json({ requestid:prev.requestid });
+							}).catch(console.log("BAD"));
+						})
+				})
+			}
+		})
+}
+
+
 
 // Upserts the given Request in the DB at the specified ID
 export function upsert(req, res) {
