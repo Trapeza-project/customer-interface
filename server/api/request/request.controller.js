@@ -14,6 +14,10 @@ import jsonpatch from 'fast-json-patch';
 import {RequestLog} from '../../sqldb';
 import {PreviousRequest} from '../../sqldb';
 import {PendingRequest} from '../../sqldb';
+import {BasicData} from '../../sqldb';
+import {ModuleSettings} from '../../sqldb';
+import {InfoType} from '../../sqldb';
+import {Actor} from '../../sqldb';
 
 function respondWithResult(res, statusCode) {
   statusCode = statusCode || 200;
@@ -70,19 +74,96 @@ export function index(req, res) {
 
 }
 
-// Gets a single Request from the DB
+// Gets a single Request
 export function show(req, res) {
-	var basic = {name:"Kalle Karlsson", personid:"199007071415", UCHandle:false, info:[{title:"Income", value:"50000/Month", timestamp:"1/1/2015"},{title:"Address", value:"Sveavägen 12", timestamp:"1/1/2015"}], timestamp:"01/01/2016", purpose:"Check to buy a phone.", access:"approved", companystatus:"pending"};
+	/*var basic = {name:"Kalle Karlsson", personid:"199007071415", UCHandle:false, timestamp:"01/01/2016", purpose:"Check to buy a phone.", access:"approved", companystatus:"pending"};
 	var html = "<div class='weak-border-bottom'><h4 class='textborderbottom'>Personal</h4><p class='fontbold'>Address</p><p>Sveavägen 12</p><p class='fontbold inlineblock'>Latest change: </p><p class='inlineblock'>1/1/2015</p><h4 class='textborderbottom'>Economical</h4><p class='fontbold'>Income</p><p>50 000 SEK/month</p><p class='fontbold inlineblock'>Latest change: </p><p class='inlineblock'>1/1/2015</p></div>";
 	var history = [{actor:{name:"Media Markt", id:"3"}, info:["Address"], timestamp:"1/1/2015", access:"approved"}, {actor:{name:"Elgiganten", id:"4"}, info:["Address", "Income"], timestamp:"1/1/2015", access:"denied"}, {actor:{name:"Media Markt", id:"3"}, info:["Address", "Income"], timestamp:"1/1/2015", access:"approved"}];
 	var data = {basic:basic, html:html, history:history};
-	res.json(data);
+	res.json(data);*/
+	RequestLog.find({
+		where:{
+			requestid: req.params.requestid
+		}
+	}).then(function(result){
+		BasicData.find({
+		where:{
+			personid:result.personid 
+		}
+		})
+		.then(function(dat){
+			
+			ModuleSettings.find({
+				where:{
+					moduleid:result.moduleid
+				}
+			}).then(function(module){
+				var data = {};
+				var basic = {};
+				basic.name = dat.firstname + " " + dat.lastname;
+				basic.personid=dat.personid;
+				basic.UCHandle = module.UCHandle;
+				data.basic = basic;
+				res.json(data);
+			})
+		})
+	})
+}
+
+export function latestuserrequest(req, res) {
+	var chainer = new Sequelize.Utils.QueryChainer;
+	var history = [];
+	return RequestLog.findAll({
+		   where: {
+			 personid: req.params.id
+			},
+		  limit:req.params.amount,
+		  order: '"timestamp" DESC'
+		}).then(function(result){
+			for(var i = 0; i<result.length; i++){
+				var data = {};
+				data.timestamp = result[i].timestamp;
+				data.access = result[i].allow;
+				data.info = [];
+				var infoids = JSON.parse(result[i].infoids);
+				for(var j = 0; j < infoids.length; j++){
+					var f = InfoType.find({
+						where:{
+							infoid:infoids[j]
+						}
+					}).then(function(infotype){
+						data.info.push(infotype.infoname);
+					})
+					chainer.add(f);
+				}
+				var func = Actor.find({
+					where:{
+						id:result[i].accessid
+					}
+				}).then(function(actor){
+					var tempActor = {};
+					tempActor.id=actor.id;
+					tempActor.name=actor.name;
+					data.actor = tempActor;
+					history.push(data);
+				})				
+			}
+		})
+	chainer.runSerially()
+	.success(function(){
+			var data = {};
+			data.history = history;
+			res.json(data);
+	})
+	.error(function(err){
+		console.log("Error");
+	})
 }
 
 // Creates a new Request in the DB
 export function create(req, res) {
 	var newRequest = RequestLog.build();
-	console.log(req.body);
+	newRequest.setDataValue('moduleid', req.body.moduleid);
 	newRequest.setDataValue('personid', req.body.id);
 	newRequest.setDataValue('accessid', req.body.accessor);
 	newRequest.setDataValue('purpose', req.body.purpose);

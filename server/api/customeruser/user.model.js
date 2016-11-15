@@ -29,6 +29,7 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       defaultValue: 'user'
     },
+	accessid:DataTypes.INTEGER,
     password: {
       type: DataTypes.STRING,
       validate: {

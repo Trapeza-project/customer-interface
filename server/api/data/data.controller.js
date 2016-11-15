@@ -135,12 +135,12 @@ export function createdata(req, res) {
 			where:{
 				personid:req.body.personid
 			}
-		}).on('success', function (person) {
+		}).then(function (person) {
 			// Check if record exists in db, and update
 			if (person) {
 				person.updateAttributes({
 					column: req.body.data
-				}).success(function(){
+				}).then(function(){
 						var entry = Datalog.build();
 						entry.setDataValue('personid', req.body.personid);
 						entry.setDataValue('infoid', req.body.infoid);

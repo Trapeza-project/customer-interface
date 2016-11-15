@@ -2,6 +2,7 @@
 
 export default function(sequelize, DataTypes) {
   return sequelize.define('Requestlog', {
+	moduleid:DataTypes.INTEGER,
 	requestid: {
       type: DataTypes.INTEGER,
       allowNull: false,

@@ -7,6 +7,7 @@ var router = express.Router();
 
 router.get('/', controller.index);
 router.get('/:id', controller.show);
+router.get('/:id/:amount', controller.latestuserrequest);
 router.post('/', controller.create);
 router.post('/answer', controller.answerrequest);
 router.put('/:id', controller.upsert);

@@ -1,15 +1,15 @@
 /**
- * Setting model events
+ * ModuleSetting model events
  */
 
 'use strict';
 
 import {EventEmitter} from 'events';
-var Setting = require('../../sqldb').Setting;
-var SettingEvents = new EventEmitter();
+var ModuleSetting = require('../../sqldb').ModuleSetting;
+var ModuleSettingEvents = new EventEmitter();
 
 // Set max event listeners (0 == unlimited)
-SettingEvents.setMaxListeners(0);
+ModuleSettingEvents.setMaxListeners(0);
 
 // Model events
 var events = {
@@ -21,15 +21,15 @@ var events = {
 // Register the event emitter to the model events
 for(var e in events) {
   let event = events[e];
-  Setting.hook(e, emitEvent(event));
+  ModuleSetting.hook(e, emitEvent(event));
 }
 
 function emitEvent(event) {
   return function(doc, options, done) {
-    SettingEvents.emit(event + ':' + doc._id, doc);
-    SettingEvents.emit(event, doc);
+    ModuleSettingEvents.emit(event + ':' + doc._id, doc);
+    ModuleSettingEvents.emit(event, doc);
     done(null);
   };
 }
 
-export default SettingEvents;
+export default ModuleSettingEvents;

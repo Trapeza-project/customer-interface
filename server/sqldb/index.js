@@ -13,13 +13,13 @@ var db = {
 };
 
 // Insert models below
+db.ModuleSetting = db.sequelize.import('../api/moduleSetting/moduleSetting.model');
 db.AdminLog = db.sequelize.import('../api/admin/adminlog.model');
 db.AdminLogin = db.sequelize.import('../api/admin/adminlogin.model');
 db.Datalog = db.sequelize.import('../api/data/datalog.model');
 db.BasicData = db.sequelize.import('../api/data/basic.model');
 db.FinancialData = db.sequelize.import('../api/data/financial.model');
 db.EducationalData = db.sequelize.import('../api/data/educational.model');
-db.Setting = db.sequelize.import('../api/setting/setting.model');
 db.Infotype = db.sequelize.import('../api/infotype/infotype.model');
 db.Actor = db.sequelize.import('../api/actor/actor.model');
 db.RequestLog = db.sequelize.import('../api/request/requestlog.model');

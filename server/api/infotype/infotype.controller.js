@@ -85,9 +85,50 @@ export function index(req, res) {
 	var data ={};
 	data.datatypes = datatypes;
 	res.json(data);
-  /*return Infotype.findAll()
-    .then(respondWithResult(res))
-    .catch(handleError(res));*/
+	
+	var chainer = new Sequelize.Utils.QueryChainer;
+	var datatypes = [];
+	var allCat = {name:"<strong>All Information</strong>", msGroup:true};
+	datatypes.push(allCat);
+	Infotype.aggregate('infotype', 'DISTINCT', { plain: false })
+    .map(function (row) { return row.DISTINCT })
+    .then(function (valueList) {
+        for(var i = 0; i < valueList.length;i++){
+			var func = InfoType.findAll({
+				where:{
+					infotype: valueList[i]
+				}
+			}).then(function(result){
+				var cat = {name:"<strong>"+valueList[i]+"</strong>", msGroup:true};
+				datatypes.push(cat);
+					for(var j=0; j < result.length;j++){
+						var info = {};
+						info.name = result[i].infoname;
+						info.id = result[i].infoid;
+						info.price = result[i].price;
+						info.ticked = false;
+						datatypes.push(info);
+					}
+				var endCat = {msGroup:false};
+				datatypes.push(endcat);
+				if(i==valueList.length-1){
+					datatypes.push({msGroup:false});
+				}
+				}
+			);
+			chainer.add(func);
+		}
+    })
+	chainer.runSerially()
+	.success(function(){
+			var data = {};
+			data.datatypes = datatypes;
+			res.json(data);
+	})
+	.error(function(err){
+		console.log("Error");
+	})
+;
 }
 
 // Gets a single Infotype from the DB

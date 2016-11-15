@@ -1,17 +1,17 @@
 /**
  * Using Rails-like standard naming convention for endpoints.
- * GET     /api/settings              ->  index
- * POST    /api/settings              ->  create
- * GET     /api/settings/:id          ->  show
- * PUT     /api/settings/:id          ->  upsert
- * PATCH   /api/settings/:id          ->  patch
- * DELETE  /api/settings/:id          ->  destroy
+ * GET     /api/moduleSettings              ->  index
+ * POST    /api/moduleSettings              ->  create
+ * GET     /api/moduleSettings/:id          ->  show
+ * PUT     /api/moduleSettings/:id          ->  upsert
+ * PATCH   /api/moduleSettings/:id          ->  patch
+ * DELETE  /api/moduleSettings/:id          ->  destroy
  */
 
 'use strict';
 
 import jsonpatch from 'fast-json-patch';
-import {Setting} from '../../sqldb';
+import {ModuleSetting} from '../../sqldb';
 
 function respondWithResult(res, statusCode) {
   statusCode = statusCode || 200;
@@ -63,43 +63,44 @@ function handleError(res, statusCode) {
   };
 }
 
-// Gets a list of Settings
+// Gets a list of ModuleSettings
 export function index(req, res) {
-  return Setting.findAll()
+  return ModuleSetting.findAll()
     .then(respondWithResult(res))
     .catch(handleError(res));
 }
 
-// Gets a single Setting from the DB
+// Gets a single ModuleSetting from the DB
 export function show(req, res) {
-	var modules = [{id:1, name:"Small", description:"Includes the basic information to the lookup.", info:[{name:"Income", id:1 ,price:5}], customized:false, active:true, UCHandle:true},{id:2, name:"Medium", description:"Includes the basic and personal information to the lookup.", info:[{name:"Income",id:1 , price:5}, {name:"Address", id:2, price:10}], customized:false, active:true, UCHandle:true},{id:3, name:"Large", description:"Includes detailed information to the lookup.", info:[{name:"Income",id:1, price:5},{name:"Address", id:2, price:10},{name:"Criminal Record", id:3, price:20}], customized:false, active:true, UCHandle:true}];
-	var data = {};
-	data.modules = modules;
-	res.json(data);
-  /*return Setting.find({
+  return ModuleSetting.findAll({
     where: {
-      _id: req.params.id
+      creatorid: req.params.id
     }
   })
     .then(handleEntityNotFound(res))
     .then(respondWithResult(res))
-    .catch(handleError(res));*/
-}
-
-// Creates a new Setting in the DB
-export function create(req, res) {
-  return Setting.create(req.body)
-    .then(respondWithResult(res, 201))
     .catch(handleError(res));
 }
 
-// Upserts the given Setting in the DB at the specified ID
+// Creates a new ModuleSetting in the DB
+export function create(req, res) {
+	var entry = ModuleSetting.build();
+	entry.setDataValue('infoids', JSON.stringify(req.body.infoids));
+	entry.setDataValue('active', req.body.active);
+	entry.setDataValue('creatorid', req.body.accessor);
+	entry.setDataValue('UCHandle', req.body.UCHandle);
+	return entry.save()
+    .then(respondWithResult(res))
+    .catch(handleError(res));
+}
+
+// Upserts the given ModuleSetting in the DB at the specified ID
 export function upsert(req, res) {
   if(req.body._id) {
     delete req.body._id;
   }
 
-  return Setting.upsert(req.body, {
+  return ModuleSetting.upsert(req.body, {
     where: {
       _id: req.params.id
     }
@@ -108,14 +109,15 @@ export function upsert(req, res) {
     .catch(handleError(res));
 }
 
-// Updates an existing Setting in the DB
+// Updates an existing ModuleSetting in the DB
 export function patch(req, res) {
-  if(req.body._id) {
-    delete req.body._id;
+  req.body.infoids = JSON.stringify(req.body.infoids);
+  if(req.body.moduleid) {
+    delete req.body.moduleid;
   }
-  return Setting.find({
+  return ModuleSetting.find({
     where: {
-      _id: req.params.id
+      moduleid: req.params.moduleid
     }
   })
     .then(handleEntityNotFound(res))
@@ -124,11 +126,11 @@ export function patch(req, res) {
     .catch(handleError(res));
 }
 
-// Deletes a Setting from the DB
+// Deletes a ModuleSetting from the DB
 export function destroy(req, res) {
-  return Setting.find({
+  return ModuleSetting.find({
     where: {
-      _id: req.params.id
+      moduleid: req.params.moduleid
     }
   })
     .then(handleEntityNotFound(res))
