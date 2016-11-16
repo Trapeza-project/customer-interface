@@ -48,8 +48,8 @@ export class LookupSettingsComponent {
   $onInit() {
   }
   
-	changeUCStatus(lookup){
-		this.lookupService.changeUCStatus(lookup.id,lookup.UCHandle);
+	changeStatus(lookup){
+		this.lookupService.changeModule(lookup);
 	}
 	
 	editModule(module){
@@ -176,9 +176,12 @@ export class LookupSettingsComponent {
 		this.editingModule = {};
 		this.editDatatypes = JSON.parse(JSON.stringify(this.originaltypes));
 	}
-	
 	deleteModule(module){
-		this.lookupService.removeModule(module);
+		var vm = this;
+		var newLookups = function(newlookups){
+			vm.lookups = newlookups;
+		}
+		this.lookupService.removeModule(module, newLookups);
 		this.editingChosendata = [];
 		//this.editingChosenData = [];
 		this.editingname = "";

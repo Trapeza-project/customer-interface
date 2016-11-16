@@ -27,7 +27,6 @@ export class LookupComponent {
 	this.lookupService = lookupService;
 	this.isAdmin = temp;
     //this.isAdmin = Auth.isAdminSync;
-	this.accessor = lookupService.getAccessor();
 	this.$http = $http;
 	this.$location = $location;
 	this.$http({
@@ -38,8 +37,12 @@ export class LookupComponent {
 				this.datatypes = response.data.datatypes;
 			}
 		});
-	this.modules = lookupService.getActiveModules();
-	
+	var vm = this;
+	vm.modules = vm.lookupService.getActiveModules();
+	var callback = function(){
+		vm.modules = vm.lookupService.getActiveModules();
+	} 
+	this.lookupService.registerObserverCallback(callback);
   }
   $onInit() {
   }
@@ -52,23 +55,27 @@ export class LookupComponent {
 				info.push(this.activeModule.info[i].id);
 				price = price + this.activeModule.info[i].price;
 			}
+			data.moduleid = this.activeModule.id;
+			data.purpose = "Quick Lookup";
 		}else{
 			for(var i = 0; i < this.chosenInfo.length; i++){
 				info.push(this.chosenInfo[i].id);
 				price = price + this.chosenInfo[i].price;
 			}
+			data.purpose = this.purpose;
 		}
 		
 		data.info = info;
 		data.id = this.id;
-		data.purpose = this.purpose;
 		data.price = price;
-		data.accessor = this.accessor;
+		data.accessor = this.lookupService.getAccessor();
+		console.log(data);
 		this.$http.post('/api/requests', data)
 		.then(response => {
 			if(response.status==200){
+				console.log(response);
 				this.lookupService.setCurrentRequestID(response.data.requestid);
-				this.$location.url('/request');
+				//this.$location.url('/request');
 			}
 		});
 	}

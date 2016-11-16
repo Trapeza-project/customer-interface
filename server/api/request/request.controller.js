@@ -106,6 +106,7 @@ return 	RequestLog.findAll({
 
 // Gets all the requests made by the customer
 export function getcustomerrequests(req, res) {
+	console.log("LOOOOOOOOOOOL");
 return 	RequestLog.findAll({
     where: {
       accessid: req.params.accessor
@@ -120,6 +121,7 @@ return 	RequestLog.findAll({
 }
 // Gets a single Request
 export function show(req, res) {
+	console.log("SHOOOOOOOOOOOW");
 	/*var basic = {name:"Kalle Karlsson", personid:"199007071415", UCHandle:false, timestamp:"01/01/2016", purpose:"Check to buy a phone.", access:"approved", companystatus:"pending"};
 	var html = "<div class='weak-border-bottom'><h4 class='textborderbottom'>Personal</h4><p class='fontbold'>Address</p><p>Sveavägen 12</p><p class='fontbold inlineblock'>Latest change: </p><p class='inlineblock'>1/1/2015</p><h4 class='textborderbottom'>Economical</h4><p class='fontbold'>Income</p><p>50 000 SEK/month</p><p class='fontbold inlineblock'>Latest change: </p><p class='inlineblock'>1/1/2015</p></div>";
 	var history = [{actor:{name:"Media Markt", id:"3"}, info:["Address"], timestamp:"1/1/2015", access:"approved"}, {actor:{name:"Elgiganten", id:"4"}, info:["Address", "Income"], timestamp:"1/1/2015", access:"denied"}, {actor:{name:"Media Markt", id:"3"}, info:["Address", "Income"], timestamp:"1/1/2015", access:"approved"}];
@@ -217,7 +219,6 @@ export function create(req, res) {
 	newRequest.setDataValue('companypending', true);
 	newRequest.setDataValue('companyallow', false);
 	newRequest.setDataValue('price', req.body.price);
-	console.log(newRequest);
   return newRequest.save()
 	.then(function(request) {
 	  var pendingRequest = PendingRequest.build();
@@ -228,9 +229,8 @@ export function create(req, res) {
 		return pendingRequest.save()
 		.then(function(pending){
 			res.json({ requestid:pending.requestid });
-		}).catch(console.log("BAD"));
-	})
-	.catch(console.log("BAD"));
+		});
+	});
 }
 
 // Answers a request

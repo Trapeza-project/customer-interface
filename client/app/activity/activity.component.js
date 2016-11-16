@@ -17,9 +17,8 @@ export class ActivityComponent {
 	var accessid = lookupService.getAccessor();
 	this.$http = $http;
 	this.$http({
-     url: '/api/requests/accessor', 
-     method: "GET",
-     params: {accessor: accessid}  
+     url: '/api/requests/accessor/'+accessid, 
+     method: "GET" 
 	}).then(response => {
 			if(response.status==200){
 				console.log(response.data);

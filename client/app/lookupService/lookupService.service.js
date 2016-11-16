@@ -14,9 +14,8 @@ export function lookupServiceService($http, Auth) {
 	this.$http = $http;
 	
 	this.$http({
-     url: '/api/moduleSettings/id', 
-     method: "GET",
-     params: {id: vm.accessor}  
+     url: '/api/moduleSettings/'+vm.accessor, 
+     method: "GET"
 	}).then(response => {
 			if(response.status==200){
 				console.log(response);
@@ -46,15 +45,6 @@ export function lookupServiceService($http, Auth) {
 		return vm.accessor;
 	}
 	
-	vm.changeUCStatus = function(id, bool){
-		for(var i = 0; i < vm.modules.length; i++){
-			if (vm.modules[i].id==id) {
-				vm.modules[i].UCHandle = bool;
-				break;
-			}
-		}
-	}
-	
 	vm.getModules = function(){
 		return vm.modules;
 	}
@@ -71,22 +61,39 @@ export function lookupServiceService($http, Auth) {
 		});
 	}
 	
-	vm.removeModule = function(module){
-		for(var i = 0; i < vm.modules.length; i++){
-			if (vm.modules[i].id==module.id) {
-				vm.modules.splice(i, 1);
-				break;
-			}
-		}
+	vm.removeModule = function(module, newLookups){
+		 this.$http({
+			 url: '/api/moduleSettings/'+module.id, 
+			 method: "DELETE"
+			}).then(response => {
+					if(response.status==200 || response.status==204){
+						for(var i = 0; i < vm.modules.length; i++){
+							if (vm.modules[i].id==module.id) {
+								vm.modules.splice(i, 1);
+								break;
+							}
+						}
+						newLookups(vm.modules);
+					}
+				});
 	}
 	
 	vm.changeModule = function(module){
-		for(var i = 0; i < vm.modules.length; i++){
-			if(module.id==vm.modules[i].id){
-				vm.modules[i].module;
-				break;
-			}
-		}
+		this.$http({
+				 url: '/api/moduleSettings/'+ vm.getAccessor(), 
+				 method: "PATCH",
+				 data: module 
+				}).then(response => {
+						if(response.status==200){
+							console.log(response);
+							for(var i = 0; i < vm.modules.length; i++){
+								if(module.id==vm.modules[i].id){
+									vm.modules[i]=module;
+									break;
+								}
+							}
+						}
+			});
 	}
 	
 	vm.getActiveModules = function(){
