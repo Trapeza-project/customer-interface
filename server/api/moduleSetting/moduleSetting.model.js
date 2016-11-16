@@ -8,6 +8,7 @@ export default function(sequelize, DataTypes) {
       primaryKey: true,
       autoIncrement: true
     },
+	modulename: DataTypes.STRING,
 	creatorid: DataTypes.INTEGER,
 	infoids: DataTypes.STRING,
 	active: DataTypes.BOOLEAN,

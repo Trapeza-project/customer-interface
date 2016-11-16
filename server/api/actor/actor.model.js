@@ -8,6 +8,8 @@ export default function(sequelize, DataTypes) {
       primaryKey: true,
     },
     name: DataTypes.STRING,
-    info: DataTypes.STRING
+    basicinfo: DataTypes.STRING,
+	description: DataTypes.STRING,
+	branch: DataTypes.STRING
   });
 }

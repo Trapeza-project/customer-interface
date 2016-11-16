@@ -2,24 +2,25 @@
 const angular = require('angular');
 
 /*@ngInject*/
-export function lookupServiceService($http) {
+export function lookupServiceService($http, Auth) {
 	// AngularJS will instantiate a singleton by calling "new" on this function
 	var vm = this;
 	vm.currentRequestID;
 	
 	vm.actorid = 0;
-	vm.accessor = 10;
+	vm.accessor = 1;
+	vm.accessor = Auth.getCurrentUserSync().accessid;
 	vm.id=0;
 	vm.modules = [];
 	
 	$http({
-     url: '/api/settings/id', 
+     url: '/api/moduleSettings/id', 
      method: "GET",
      params: {id: vm.accessor}  
 	}).then(response => {
 			if(response.status==200){
-				vm.modules = response.data.modules;
-				vm.id = vm.modules[vm.modules.length-1].id + 1;
+				console.log(response);
+				vm.modules = response.data;
 				vm.notifyObservers();
 			}
 		});

@@ -12,6 +12,8 @@
 
 import jsonpatch from 'fast-json-patch';
 import {ModuleSetting} from '../../sqldb';
+import {Infotype} from '../../sqldb';
+import Sequelize from 'sequelize';
 
 function respondWithResult(res, statusCode) {
   statusCode = statusCode || 200;
@@ -70,16 +72,41 @@ export function index(req, res) {
     .catch(handleError(res));
 }
 
-// Gets a single ModuleSetting from the DB
+// Gets ModuleSetting for a single user from the DB
 export function show(req, res) {
+  var modules = [];
+  var promises = [];
   return ModuleSetting.findAll({
     where: {
-      creatorid: req.params.id
+	  $or: [{creatorid: req.params.id}, {creatorid: 0}]
     }
+  }).then(function(modules){
+	  for(var i = 0; i < modules.length; i++){
+			var module = {};
+			module.name = modules[i].modulename;
+			module.active = modules[i].active;
+			module.UCHandle = modules[i].UCHandle;
+		  var infoids = JSON.parse(modules[i].infoids);
+		  var tempids = [];
+		  for(var j = 0; j < infoids.length; j++){
+			var promise = Infotype.find({
+				where: {
+					infoid : infoids[j]
+				}
+			}).then(function(info){
+				/*tempids.push(info.infoname);
+				if(infoids.length-1 == j){
+					modules.push(module);
+				}*/
+			})
+			
+			promises.push(promise);
+		  }
+	  }
   })
-    .then(handleEntityNotFound(res))
-    .then(respondWithResult(res))
-    .catch(handleError(res));
+	return Sequelize.Promise.all(promises).then(function(){
+		res.json(modules);
+	})
 }
 
 // Creates a new ModuleSetting in the DB

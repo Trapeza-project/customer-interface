@@ -74,6 +74,50 @@ export function index(req, res) {
 
 }
 
+// Gets the pending requests for a person
+export function getpendingrequests(req, res) {
+return 	PendingRequest.findAll({
+    where: {
+      personid: req.params.personid
+    },
+	order: '"timestamp" DESC'
+  })
+    .then(handleEntityNotFound(res))
+    .then(respondWithResult(res))
+    .catch(handleError(res));
+
+}
+
+
+// Gets all the requests for a person
+export function getallrequests(req, res) {
+return 	RequestLog.findAll({
+    where: {
+      personid: req.params.person
+    },
+	order: '"timestamp" DESC'
+  })
+    .then(handleEntityNotFound(res))
+    .then(respondWithResult(res))
+    .catch(handleError(res));
+
+
+}
+
+// Gets all the requests made by the customer
+export function getcustomerrequests(req, res) {
+return 	RequestLog.findAll({
+    where: {
+      accessid: req.params.accessor
+    },
+	order: '"timestamp" DESC'
+  })
+    .then(handleEntityNotFound(res))
+    .then(respondWithResult(res))
+    .catch(handleError(res));
+
+
+}
 // Gets a single Request
 export function show(req, res) {
 	/*var basic = {name:"Kalle Karlsson", personid:"199007071415", UCHandle:false, timestamp:"01/01/2016", purpose:"Check to buy a phone.", access:"approved", companystatus:"pending"};
@@ -170,6 +214,8 @@ export function create(req, res) {
 	newRequest.setDataValue('infoids', JSON.stringify(req.body.info));
 	newRequest.setDataValue('pending', true);
 	newRequest.setDataValue('allow', false);
+	newRequest.setDataValue('companypending', true);
+	newRequest.setDataValue('companyallow', false);
 	newRequest.setDataValue('price', req.body.price);
 	console.log(newRequest);
   return newRequest.save()

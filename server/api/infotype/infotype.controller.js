@@ -86,7 +86,6 @@ export function index(req, res) {
 	data.datatypes = datatypes;
 	res.json(data);
 	
-	var chainer = new Sequelize.Utils.QueryChainer;
 	var datatypes = [];
 	var allCat = {name:"<strong>All Information</strong>", msGroup:true};
 	datatypes.push(allCat);
@@ -116,19 +115,9 @@ export function index(req, res) {
 				}
 				}
 			);
-			chainer.add(func);
 		}
     })
-	chainer.runSerially()
-	.success(function(){
-			var data = {};
-			data.datatypes = datatypes;
-			res.json(data);
-	})
-	.error(function(err){
-		console.log("Error");
-	})
-;
+	
 }
 
 // Gets a single Infotype from the DB

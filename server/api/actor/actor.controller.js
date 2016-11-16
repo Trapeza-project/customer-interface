@@ -72,16 +72,18 @@ export function index(req, res) {
 
 // Gets a single Actor from the DB
 export function show(req, res) {
-  var data = {name:"Media Markt", basicinfo:"A retail store.", description:"Media Markt is a German chain of stores selling consumer electronics with numerous branches throughout Europe and Asia. It is Europe's largest retailer of consumer electronics, and the second largest in the world after American retailer Best Buy.", branch:["Retail","Electronics"]};
-  res.json(data);
-  /*return Actor.find({
+  //var data = {name:"Media Markt", basicinfo:"A retail store.", description:"Media Markt is a German chain of stores selling consumer electronics with numerous branches throughout Europe and Asia. It is Europe's largest retailer of consumer electronics, and the second largest in the world after American retailer Best Buy.", branch:["Retail","Electronics"]};
+  //res.json(data);
+  return Actor.find({
     where: {
       id: req.params.id
     }
-  })
+  }).then(function(res){
+	  res.branch = JSON.parse(res.branch)
+	 })
     .then(handleEntityNotFound(res))
     .then(respondWithResult(res))
-    .catch(handleError(res));*/
+    .catch(handleError(res));
 }
 
 // Creates a new Actor in the DB

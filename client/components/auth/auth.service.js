@@ -5,6 +5,7 @@ class _User {
   name = '';
   email = '';
   role = '';
+  accessid = '';
   $promise = undefined;
 }
 
@@ -49,6 +50,7 @@ export function AuthService($location, $http, $cookies, $q, appConfig, Util, Use
           return currentUser.$promise;
         })
         .then(user => {
+			console.log(user);
           safeCb(callback)(null, user);
           return user;
         })

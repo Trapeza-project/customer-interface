@@ -129,6 +129,7 @@ export function me(req, res, next) {
       'name',
       'email',
       'role',
+	  'accessid',
       'provider'
     ]
   })
