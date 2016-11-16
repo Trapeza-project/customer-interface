@@ -6,14 +6,14 @@ export function lookupServiceService($http, Auth) {
 	// AngularJS will instantiate a singleton by calling "new" on this function
 	var vm = this;
 	vm.currentRequestID;
-	
+	this.Auth = Auth;
 	vm.actorid = 0;
 	vm.accessor = 1;
-	vm.accessor = Auth.getCurrentUserSync().accessid;
 	vm.id=0;
 	vm.modules = [];
+	this.$http = $http;
 	
-	$http({
+	this.$http({
      url: '/api/moduleSettings/id', 
      method: "GET",
      params: {id: vm.accessor}  
@@ -42,6 +42,7 @@ export function lookupServiceService($http, Auth) {
 	}
 	
 	vm.getAccessor = function(){
+		vm.accessor = Auth.getCurrentUserSync().accessid;
 		return vm.accessor;
 	}
 	
@@ -58,8 +59,16 @@ export function lookupServiceService($http, Auth) {
 		return vm.modules;
 	}
 	
-	vm.addModule = function(module){
-		vm.modules.push(module);
+	vm.addModule = function(module, newLookups){
+	module.accessor = vm.getAccessor();
+	this.$http.post('/api/moduleSettings', module)
+		.then(response => {
+			if(response.status==200){
+				console.log(response);
+				vm.modules.push(response.data);
+				newLookups(vm.modules);
+			}
+		});
 	}
 	
 	vm.removeModule = function(module){

@@ -75,50 +75,77 @@ export function index(req, res) {
 // Gets ModuleSetting for a single user from the DB
 export function show(req, res) {
   var modules = [];
-  var promises = [];
-  return ModuleSetting.findAll({
+  return ModuleSetting.findAll(/*{
     where: {
 	  $or: [{creatorid: req.params.id}, {creatorid: 0}]
     }
-  }).then(function(modules){
-	  for(var i = 0; i < modules.length; i++){
-			var module = {};
-			module.name = modules[i].modulename;
-			module.active = modules[i].active;
-			module.UCHandle = modules[i].UCHandle;
-		  var infoids = JSON.parse(modules[i].infoids);
-		  var tempids = [];
-		  for(var j = 0; j < infoids.length; j++){
-			var promise = Infotype.find({
+  }*/).mapSeries(function(module){
+		var dataValues = module.dataValues;
+		var tempModule = {};
+		tempModule.id = dataValues.moduleid;
+		tempModule.name = dataValues.modulename;
+		tempModule.active = dataValues.active;
+		tempModule.UCHandle = dataValues.UCHandle;
+		tempModule.description = dataValues.description;
+		tempModule.customized = true;
+		if(dataValues.creatorid == 0){
+			tempModule.customized = false;
+		}
+	  var infoids = JSON.parse(dataValues.infoids);
+	  var tempids = [];
+	  var promises = [];
+	  infoids.forEach(function(id){
+			promises.push(Infotype.find({
 				where: {
-					infoid : infoids[j]
+					infoid : id
 				}
 			}).then(function(info){
-				/*tempids.push(info.infoname);
-				if(infoids.length-1 == j){
-					modules.push(module);
-				}*/
-			})
-			
-			promises.push(promise);
-		  }
-	  }
-  })
-	return Sequelize.Promise.all(promises).then(function(){
-		res.json(modules);
-	})
+				if(info == null){
+					return;
+				}
+				var infoValues = info.dataValues;
+				var infoObj = {};
+				infoObj.price = infoValues.price;
+				infoObj.name = infoValues.infoname;
+				infoObj.id = infoValues.infoid;
+				tempids.push(infoObj);
+			}))
+		})
+		
+		return Sequelize.Promise.all(promises).then(function(){
+				tempModule.info = tempids;
+				modules.push(tempModule);
+		})  
+	  }).then(function(){
+		   res.json(modules);
+		 })
 }
 
 // Creates a new ModuleSetting in the DB
 export function create(req, res) {
+	var tempModule = {};
+	tempModule.info=req.body.info;
+	tempModule.active = req.body.active;
+	tempModule.name=req.body.name;
+	tempModule.description = req.body.description;
+	tempModule.UCHandle = req.body.UCHandle;
+	tempModule.customized = true;
+	var infoids  = [];
+	for(var i = 0; i < req.body.info.length; i++){
+		infoids.push(req.body.info[i].id);
+	}
 	var entry = ModuleSetting.build();
-	entry.setDataValue('infoids', JSON.stringify(req.body.infoids));
+	entry.setDataValue('infoids', JSON.stringify(infoids));
 	entry.setDataValue('active', req.body.active);
+	entry.setDataValue('modulename', req.body.name);
+	entry.setDataValue('description', req.body.description);
 	entry.setDataValue('creatorid', req.body.accessor);
 	entry.setDataValue('UCHandle', req.body.UCHandle);
 	return entry.save()
-    .then(respondWithResult(res))
-    .catch(handleError(res));
+    .then(function(result){
+			tempModule.id = result.dataValues.moduleid;
+			res.json(tempModule);
+		})
 }
 
 // Upserts the given ModuleSetting in the DB at the specified ID
@@ -138,19 +165,34 @@ export function upsert(req, res) {
 
 // Updates an existing ModuleSetting in the DB
 export function patch(req, res) {
-  req.body.infoids = JSON.stringify(req.body.infoids);
-  if(req.body.moduleid) {
-    delete req.body.moduleid;
-  }
-  return ModuleSetting.find({
-    where: {
-      moduleid: req.params.moduleid
+var tempModule = {};
+	tempModule.info=req.body.info;
+	tempModule.active = req.body.active;
+	tempModule.name=req.body.name;
+	tempModule.description = req.body.description;
+	tempModule.UCHandle = req.body.UCHandle;
+	tempModule.customized = true;
+	tempModule.id = req.body.id;
+	var infoids  = [];
+	for(var i = 0; i < req.body.info.length; i++){
+		infoids.push(req.body.info[i].id);
+	}
+	ModuleSetting.find({ where: { moduleid: id } })
+  .on('success', function (module) {
+    // Check if record exists in db
+    if (module) {
+      module.updateAttributes({
+		  infoids : JSON.stringify(infoids),
+		  active : req.body.active,
+		  modulename : req.body.name,
+		  description : req.body.description,
+		  UCHandle : req.body.UCHandle
+	}).then(function(){
+		res.json(tempModule);
+	})
     }
   })
-    .then(handleEntityNotFound(res))
-    .then(patchUpdates(req.body))
-    .then(respondWithResult(res))
-    .catch(handleError(res));
+		
 }
 
 // Deletes a ModuleSetting from the DB

@@ -12,6 +12,7 @@
 
 import jsonpatch from 'fast-json-patch';
 import {Infotype} from '../../sqldb';
+import Sequelize from 'sequelize';
 
 function respondWithResult(res, statusCode) {
   statusCode = statusCode || 200;
@@ -65,7 +66,7 @@ function handleError(res, statusCode) {
 
 // Gets a list of Infotypes
 export function index(req, res) {
-	var datatypes = [];
+	/*var datatypes = [];
 	var allCat = {name:"<strong>All Information</strong>", msGroup:true};
 	var financialCat = {name:"<strong>Financial</strong>", msGroup:true};
 	var income = {name:"Income", id:1, price:5, ticked:false};
@@ -84,40 +85,44 @@ export function index(req, res) {
 	datatypes.push(endAllCat);
 	var data ={};
 	data.datatypes = datatypes;
-	res.json(data);
+	res.json(data);*/
 	
 	var datatypes = [];
 	var allCat = {name:"<strong>All Information</strong>", msGroup:true};
 	datatypes.push(allCat);
 	Infotype.aggregate('infotype', 'DISTINCT', { plain: false })
-    .map(function (row) { return row.DISTINCT })
-    .then(function (valueList) {
-        for(var i = 0; i < valueList.length;i++){
-			var func = InfoType.findAll({
+    .mapSeries(function (row) { 
+		var category = row.DISTINCT;
+		var cat = {name:"<strong>"+category+"</strong>", msGroup:true};
+		var promises = [];
+		datatypes.push(cat);
+		promises.push(Infotype.findAll({
 				where:{
-					infotype: valueList[i]
+					infotype: category
 				}
 			}).then(function(result){
-				var cat = {name:"<strong>"+valueList[i]+"</strong>", msGroup:true};
-				datatypes.push(cat);
-					for(var j=0; j < result.length;j++){
+					for(var i=0; i < result.length;i++){
+						var resData = result[i].dataValues;
 						var info = {};
-						info.name = result[i].infoname;
-						info.id = result[i].infoid;
-						info.price = result[i].price;
+						info.name = resData.infoname;
+						info.id = resData.infoid;
+						info.price = resData.price;
 						info.ticked = false;
 						datatypes.push(info);
 					}
-				var endCat = {msGroup:false};
-				datatypes.push(endcat);
-				if(i==valueList.length-1){
-					datatypes.push({msGroup:false});
 				}
-				}
-			);
-		}
+			))
+			return Sequelize.Promise.all(promises).then(function(){
+				datatypes.push({msGroup:false});
+				promises = [];
+			});
+	})
+    .then(function () {
+		datatypes.push({msGroup:false});
+		var data = {};
+		data.datatypes = datatypes;
+		res.json(data);
     })
-	
 }
 
 // Gets a single Infotype from the DB

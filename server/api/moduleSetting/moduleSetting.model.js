@@ -9,6 +9,7 @@ export default function(sequelize, DataTypes) {
       autoIncrement: true
     },
 	modulename: DataTypes.STRING,
+	description: DataTypes.STRING,
 	creatorid: DataTypes.INTEGER,
 	infoids: DataTypes.STRING,
 	active: DataTypes.BOOLEAN,
