@@ -185,7 +185,6 @@ export function show(req, res) {
 		}
 		})
 		.then(function(dat){
-			console.log(dataValues);
 			if(dat==null){
 				return;
 			}
@@ -196,9 +195,13 @@ export function show(req, res) {
 			}).then(function(module){
 				var data = {};
 				var basic = {};
+				if(module==null){
+					basic.UCHandle = true;
+				}else{
+					basic.UCHandle = module.dataValues.UCHandle;
+				}
 				basic.name = dat.dataValues.firstname + " " + dat.dataValues.lastname;
 				basic.personid=dat.dataValues.personid;
-				basic.UCHandle = module.dataValues.UCHandle;
 				var date = new Date(dataValues.timestamp);
 				basic.timestamp = date.getFullYear() + '/' + (date.getMonth()+1) + '/' + date.getDate() + " " + date.getHours()+":"+date.getMinutes()+":"+date.getSeconds(); 
 				basic.purpose = dataValues.purpose;
@@ -214,7 +217,7 @@ export function show(req, res) {
 }
 
 export function latestuserrequest(req, res) {
-	var chainer = new Sequelize.Utils.QueryChainer;
+	//var history = [{actor:{name:"Media Markt", id:"3"}, info:["Address"], timestamp:"1/1/2015", access:"approved"}, {actor:{name:"Elgiganten", id:"4"}, info:["Address", "Income"], timestamp:"1/1/2015", access:"denied"}, {actor:{name:"Media Markt", id:"3"}, info:["Address", "Income"], timestamp:"1/1/2015", access:"approved"}];
 	var history = [];
 	return RequestLog.findAll({
 		   where: {
@@ -222,62 +225,80 @@ export function latestuserrequest(req, res) {
 			},
 		  limit:req.params.amount,
 		  order: '"timestamp" DESC'
-		}).then(function(result){
-			for(var i = 0; i<result.length; i++){
-				var data = {};
-				data.timestamp = result[i].timestamp;
-				data.access = result[i].allow;
-				data.info = [];
-				var infoids = JSON.parse(result[i].infoids);
-				for(var j = 0; j < infoids.length; j++){
-					var f = InfoType.find({
-						where:{
-							infoid:infoids[j]
-						}
-					}).then(function(infotype){
-						data.info.push(infotype.infoname);
-					})
-					chainer.add(f);
-				}
-				var func = Actor.find({
+		}).mapSeries(function(request){
+			console.log(request);
+			var dataValues = request.dataValues;
+			var data = {};
+			var date = new Date(dataValues.timestamp);
+			data.timestamp = date.getFullYear() + '/' + (date.getMonth()+1) + '/' + date.getDate(); 
+			data.access = dataValues.allow;
+			
+			var tempids = [];
+			var promises = [];
+			var infoids = JSON.parse(dataValues.infoids);
+			
+			infoids.forEach(function(id){
+				promises.push(Infotype.find({
+					where: {
+						infoid : id
+					}
+				}).then(function(info){
+					if(info == null){
+						return;
+					}
+					var infoValues = info.dataValues;
+					tempids.push(infoValues.infoname);
+				}))
+			})
+			promises.push(Actor.find({
 					where:{
-						id:result[i].accessid
+						id:dataValues.accessid
 					}
 				}).then(function(actor){
 					var tempActor = {};
-					tempActor.id=actor.id;
-					tempActor.name=actor.name;
+					tempActor.id=actor.dataValues.id;
+					tempActor.name=actor.dataValues.name;
 					data.actor = tempActor;
+				}));
+		
+			return Sequelize.Promise.all(promises).then(function(){
+					data.info = tempids;
 					history.push(data);
-				})				
-			}
-		})
-	chainer.runSerially()
-	.success(function(){
+			}) 
+			
+		}).then(function(){
 			var data = {};
 			data.history = history;
 			res.json(data);
-	})
-	.error(function(err){
-		console.log("Error");
 	})
 }
 
 // Creates a new Request in the DB
 export function create(req, res) {
 	var newRequest = RequestLog.build();
-	newRequest.setDataValue('moduleid', req.body.moduleid);
-	newRequest.setDataValue('personid', req.body.id);
-	newRequest.setDataValue('accessid', req.body.accessor);
-	newRequest.setDataValue('purpose', req.body.purpose);
-	newRequest.setDataValue('infoids', JSON.stringify(req.body.info));
-	newRequest.setDataValue('pending', true);
-	newRequest.setDataValue('allow', false);
-	newRequest.setDataValue('companypending', true);
-	newRequest.setDataValue('companyallow', false);
-	newRequest.setDataValue('price', req.body.price);
-  return newRequest.save()
-	.then(function(request) {
+	return ModuleSetting.find({
+		where:{
+			moduleid: req.body.moduleid,
+			UCHandle: true
+		}
+	}).then(function(mod){
+		if(mod==null){
+			newRequest.setDataValue('companypending', true);
+			newRequest.setDataValue('companyallow', false);
+		}else{
+			newRequest.setDataValue('companypending', false);
+			newRequest.setDataValue('companyallow', true);
+		}
+		newRequest.setDataValue('moduleid', req.body.moduleid);
+		newRequest.setDataValue('personid', req.body.id);
+		newRequest.setDataValue('accessid', req.body.accessor);
+		newRequest.setDataValue('purpose', req.body.purpose);
+		newRequest.setDataValue('infoids', JSON.stringify(req.body.info));
+		newRequest.setDataValue('pending', true);
+		newRequest.setDataValue('allow', false);
+		newRequest.setDataValue('price', req.body.price);
+		return newRequest.save();
+	}).then(function(request) {
 	  var pendingRequest = PendingRequest.build();
 		pendingRequest.setDataValue('personid', req.body.id);
 		pendingRequest.setDataValue('accessid', req.body.accessor);

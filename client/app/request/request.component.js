@@ -12,7 +12,7 @@ export class RequestComponent {
 	history = [];
 	requesthtml="";
   /*@ngInject*/
-  constructor($http, $location, lookupService, modalService, Auth) {
+  constructor($timeout, $scope, $http, $location, lookupService, modalService, Auth) {
 	'ngInject';
 
 	function temp(){
@@ -25,15 +25,30 @@ export class RequestComponent {
 	this.lookupService = lookupService;
 	this.modalService = modalService;
 	this.requestid = lookupService.getCurrentRequestID();
-	
 	this.$http({
      url: '/api/requests/'+this.requestid, 
      method: "GET" 
 	}).then(response => {
 			if(response.status==200){
 				this.requestdata = response.data.basic;
-				//this.requesthtml = response.data.html;
-				//this.history = response.data.history;
+				  this.$http({
+					 url: '/api/requests/'+this.requestdata.personid+'/10', 
+					 method: "GET" 
+					}).then(response => {
+							if(response.status==200){
+								this.history = response.data.history;
+							}
+						});
+			}
+		});
+
+		
+  this.$http({
+     url: '/api/datas/request/'+this.requestid, 
+     method: "GET" 
+	}).then(response => {
+			if(response.status==200){
+				this.requesthtml = response.data.html;
 			}
 		});
   }
@@ -78,21 +93,6 @@ export class RequestComponent {
 	}
 	deniedcompanyrequest(){
 		if((this.requestdata.companyallow==false && this.requestdata.companypending==false) || (this.requestdata.allow == false && this.requestdata.pending ==false)){
-			return true;
-		}else{
-			return false;
-		}
-	}
-	
-	approvedLookup(lookup){
-		if(lookup.allow == true && lookup.pending == false){
-			return true;
-		}else{
-			return false;
-		}
-	}
-	deniedLookup(lookup){
-		if(lookup.allow == false && lookup.pending ==false){
 			return true;
 		}else{
 			return false;

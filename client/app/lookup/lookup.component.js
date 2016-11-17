@@ -145,7 +145,7 @@ export class LookupComponent {
 	}
 	
 	buttonDisable(){
-		if((Object.keys(this.activeModule).length === 0) || this.id.length != 12){
+		if(((Object.keys(this.activeModule).length === 0)&&this.chosenInfo.length==0) || this.id.length != 12){
 			return true;
 		}else{
 			return false;

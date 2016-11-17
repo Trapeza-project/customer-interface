@@ -12,9 +12,8 @@ export class ActorComponent {
 	this.actorid = lookupService.getActiveActorID();
 	
 	this.$http({
-     url: '/api/actors/id', 
-     method: "GET",
-     params: {id: this.actorid}  
+     url: '/api/actors/'+this.actorid, 
+     method: "GET" 
 	}).then(response => {
 			if(response.status==200){;
 				this.actor = response.data;
