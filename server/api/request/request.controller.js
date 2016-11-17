@@ -178,6 +178,9 @@ export function show(req, res) {
 			requestid: req.params.requestid
 		}
 	}).then(function(result){
+		if(result==null){
+			return;
+		}
 		var dataValues = result.dataValues;
 		BasicData.find({
 		where:{
@@ -196,7 +199,7 @@ export function show(req, res) {
 				var data = {};
 				var basic = {};
 				if(module==null){
-					basic.UCHandle = true;
+					basic.UCHandle = false;
 				}else{
 					basic.UCHandle = module.dataValues.UCHandle;
 				}
@@ -226,7 +229,6 @@ export function latestuserrequest(req, res) {
 		  limit:req.params.amount,
 		  order: '"timestamp" DESC'
 		}).mapSeries(function(request){
-			console.log(request);
 			var dataValues = request.dataValues;
 			var data = {};
 			var date = new Date(dataValues.timestamp);
@@ -311,21 +313,44 @@ export function create(req, res) {
 	});
 }
 
-// Answers a request
-export function answerrequest(req, res) {
+// Answer a customer request
+export function answercustomerrequest(req, res) {
 	var id = req.body.requestid;
-	var approve = req.body.answer;
-	RequestLog.find({
+	var allow = req.body.companyallow;
+return RequestLog.find({
 			where:{
 				requestid:id
 			}
-		}).on('success', function (request) {
+		}).then(function (request) {
+			// Check if record exists in db, and update
+			if (request) {
+				request.updateAttributes({
+					companypending: false,
+					companyallow: allow
+				}).then(function(){
+					return res.json({approve:true});
+			})
+			}else{
+				res.json({approve:false});
+			}
+		})
+}
+
+// Answers a user request
+export function answeruserrequest(req, res) {
+	var id = req.body.requestid;
+	var approve = req.body.answer;
+	return RequestLog.find({
+			where:{
+				requestid:id
+			}
+		}).then(function (request) {
 			// Check if record exists in db, and update
 			if (request) {
 				request.updateAttributes({
 					pending: false,
 					allow: approve
-				}).success(function(){
+				}).then(function(){
 					// Remove from pendingrequests
 					
 					PendingRequest.destroy({

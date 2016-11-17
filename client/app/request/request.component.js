@@ -100,7 +100,7 @@ export class RequestComponent {
 	}
 	
 	displayButton(){
-		if(this.isAdmin() && this.requestdata.companypending==true && !this.requestdata.UCHandle){
+		if(this.isAdmin() && this.requestdata.companypending==true && !this.requestdata.UCHandle && this.requestdata.allow==true){
 			return true;
 		}else{
 			return false;
@@ -116,9 +116,20 @@ export class RequestComponent {
 		};
 		var vm = this;
 		this.modalService.showModal({}, modalOptions)
-			.then(function (result) {
-					 vm.requestdata.companyallow = true;
-					 vm.requestdata.companypending = false;
+			.then(function (result) {				
+				var data = {};
+				data.requestid = vm.requestid;
+				data.companyallow=true;
+				vm.$http.post('/api/requests/companyanswer', data)
+				.then(response => {
+					console.log(response);
+					if(response.status==200){
+							if(response.data.approve==true){
+								vm.requestdata.companyallow=true;
+								vm.requestdata.companypending=false;
+							}
+					}
+				});
 			});
 	}
 	denyRequest(){
@@ -131,8 +142,19 @@ export class RequestComponent {
 		var vm = this;
 		this.modalService.showModal({}, modalOptions)
 			.then(function (result) {
-					 vm.requestdata.companyallow=false;
-					 vm.requestdata.companypending=false;
+				var data = {};
+				data.requestid = vm.requestid;
+				data.companyallow=false;
+				vm.$http.post('/api/requests/companyanswer', data)
+				.then(response => {
+					console.log(response);
+					if(response.status==200){
+							if(response.data.approve==true){
+								vm.requestdata.companyallow=false;
+								vm.requestdata.companypending=false;
+							}
+					}
+				});
 			});
 
 	}
