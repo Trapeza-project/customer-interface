@@ -15,9 +15,10 @@ import {RequestLog} from '../../sqldb';
 import {PreviousRequest} from '../../sqldb';
 import {PendingRequest} from '../../sqldb';
 import {BasicData} from '../../sqldb';
-import {ModuleSettings} from '../../sqldb';
-import {InfoType} from '../../sqldb';
+import {ModuleSetting} from '../../sqldb';
+import {Infotype} from '../../sqldb';
 import {Actor} from '../../sqldb';
+import Sequelize from 'sequelize';
 
 function respondWithResult(res, statusCode) {
   statusCode = statusCode || 200;
@@ -106,22 +107,67 @@ return 	RequestLog.findAll({
 
 // Gets all the requests made by the customer
 export function getcustomerrequests(req, res) {
-	console.log("LOOOOOOOOOOOL");
+	var customerReq = [];
 return 	RequestLog.findAll({
     where: {
       accessid: req.params.accessor
     },
 	order: '"timestamp" DESC'
-  })
-    .then(handleEntityNotFound(res))
-    .then(respondWithResult(res))
-    .catch(handleError(res));
+  }).mapSeries(function(request){
+		var dataValues = request.dataValues;
+		var tempRequest = {};
+		tempRequest.requestid = dataValues.requestid;
+		tempRequest.allow = dataValues.allow;
+		tempRequest.companyallow = dataValues.companyallow;
+		tempRequest.companypending = dataValues.companypending;
+		tempRequest.pending = dataValues.pending;
+		tempRequest.personid = dataValues.personid;
+		var date = new Date(dataValues.timestamp);
+		tempRequest.timestamp = date.getFullYear() + '/' + (date.getMonth()+1) + '/' + date.getDate() + " " + date.getHours()+":"+date.getMinutes()+":"+date.getSeconds(); 
+
+	  var infoids = JSON.parse(dataValues.infoids);
+	  var tempids = [];
+	  var promises = [];
+	  promises.push(BasicData.find({
+		  where: {
+			  personid: tempRequest.personid
+		  }
+	  }).then(function(basData){
+		  if(basData != null){
+			  var bas = basData.dataValues;
+			  tempRequest.name = bas.firstname + " " + bas.lastname;
+		  }else{
+			  tempRequest.name = "NOT FOUND";
+		  }
+	  })
+	  )
+	  
+	  infoids.forEach(function(id){
+			promises.push(Infotype.find({
+				where: {
+					infoid : id
+				}
+			}).then(function(info){
+				if(info == null){
+					return;
+				}
+				var infoValues = info.dataValues;
+				tempids.push(infoValues.infoname);
+			}))
+		})
+		
+		return Sequelize.Promise.all(promises).then(function(){
+				tempRequest.info = tempids;
+				customerReq.push(tempRequest);
+		})  
+  }).then(function(){
+		   res.json(customerReq);
+		})
 
 
 }
 // Gets a single Request
 export function show(req, res) {
-	console.log("SHOOOOOOOOOOOW");
 	/*var basic = {name:"Kalle Karlsson", personid:"199007071415", UCHandle:false, timestamp:"01/01/2016", purpose:"Check to buy a phone.", access:"approved", companystatus:"pending"};
 	var html = "<div class='weak-border-bottom'><h4 class='textborderbottom'>Personal</h4><p class='fontbold'>Address</p><p>Sveavägen 12</p><p class='fontbold inlineblock'>Latest change: </p><p class='inlineblock'>1/1/2015</p><h4 class='textborderbottom'>Economical</h4><p class='fontbold'>Income</p><p>50 000 SEK/month</p><p class='fontbold inlineblock'>Latest change: </p><p class='inlineblock'>1/1/2015</p></div>";
 	var history = [{actor:{name:"Media Markt", id:"3"}, info:["Address"], timestamp:"1/1/2015", access:"approved"}, {actor:{name:"Elgiganten", id:"4"}, info:["Address", "Income"], timestamp:"1/1/2015", access:"denied"}, {actor:{name:"Media Markt", id:"3"}, info:["Address", "Income"], timestamp:"1/1/2015", access:"approved"}];
@@ -132,23 +178,34 @@ export function show(req, res) {
 			requestid: req.params.requestid
 		}
 	}).then(function(result){
+		var dataValues = result.dataValues;
 		BasicData.find({
 		where:{
-			personid:result.personid 
+			personid:dataValues.personid 
 		}
 		})
 		.then(function(dat){
-			
-			ModuleSettings.find({
+			console.log(dataValues);
+			if(dat==null){
+				return;
+			}
+			ModuleSetting.find({
 				where:{
-					moduleid:result.moduleid
+					moduleid:dataValues.moduleid
 				}
 			}).then(function(module){
 				var data = {};
 				var basic = {};
-				basic.name = dat.firstname + " " + dat.lastname;
-				basic.personid=dat.personid;
-				basic.UCHandle = module.UCHandle;
+				basic.name = dat.dataValues.firstname + " " + dat.dataValues.lastname;
+				basic.personid=dat.dataValues.personid;
+				basic.UCHandle = module.dataValues.UCHandle;
+				var date = new Date(dataValues.timestamp);
+				basic.timestamp = date.getFullYear() + '/' + (date.getMonth()+1) + '/' + date.getDate() + " " + date.getHours()+":"+date.getMinutes()+":"+date.getSeconds(); 
+				basic.purpose = dataValues.purpose;
+				basic.allow = dataValues.allow;
+				basic.companyallow = dataValues.companyallow;
+				basic.companypending = dataValues.companypending;
+				basic.pending = dataValues.pending;
 				data.basic = basic;
 				res.json(data);
 			})

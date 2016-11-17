@@ -75,7 +75,7 @@ export class LookupComponent {
 			if(response.status==200){
 				console.log(response);
 				this.lookupService.setCurrentRequestID(response.data.requestid);
-				//this.$location.url('/request');
+				this.$location.url('/request');
 			}
 		});
 	}

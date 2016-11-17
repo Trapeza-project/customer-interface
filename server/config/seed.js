@@ -9,6 +9,7 @@ var Thing = sqldb.Thing;
 var User = sqldb.CustomerUser;
 var ModuleSettings = sqldb.ModuleSetting;
 var Infotype = sqldb.Infotype;
+var BasicData = sqldb.BasicData;
 
 Thing.sync()
   .then(() =>
@@ -71,6 +72,7 @@ ModuleSettings.sync()
 .then(() => ModuleSettings.destroy({ where: {} }))
 .then(() => {
 ModuleSettings.bulkCreate([{
+  moduleid:1,
   creatorid:0,
   modulename:"Small",
   description:"Includes the basic information to the lookup.",
@@ -78,6 +80,7 @@ ModuleSettings.bulkCreate([{
   active: true,
   UCHandle: true
 }, {
+  moduleid:2,
   creatorid:0,
   modulename:"Medium",
   description:"Includes the basic and personal information to the lookup.",
@@ -85,6 +88,7 @@ ModuleSettings.bulkCreate([{
   active: true,
   UCHandle: true
 }, {
+  moduleid:3,
   creatorid:0,
   modulename:"Large",
   description:"Includes detailed information to the lookup.",
@@ -119,5 +123,29 @@ Infotype.sync()
     }])
     .then(() => {
       console.log('finished populating infotypes');
+    });
+  });
+  
+BasicData.sync()
+  .then(() => BasicData.destroy({ where: {} }))
+  .then(() => {
+    BasicData.bulkCreate([{
+      personid: 111111111111,
+	  firstname: "Kalle",
+	  lastname: "Svensson",
+	  address: "Sveavägen 14"
+    }, {
+      personid: 222222222222,
+	  firstname: "Anna",
+	  lastname: "Karlsson",
+	  address: "Sveavägen 17"
+    }, {
+      personid: 333333333333,
+	  firstname: "Lisa",
+	  lastname: "Andersson",
+	  address: "Sveavägen 20"
+    }])
+    .then(() => {
+      console.log('finished populating basic data');
     });
   });

@@ -27,14 +27,13 @@ export class RequestComponent {
 	this.requestid = lookupService.getCurrentRequestID();
 	
 	this.$http({
-     url: '/api/requests/id', 
-     method: "GET",
-     params: {id: this.requestid}  
+     url: '/api/requests/'+this.requestid, 
+     method: "GET" 
 	}).then(response => {
 			if(response.status==200){
 				this.requestdata = response.data.basic;
-				this.requesthtml = response.data.html;
-				this.history = response.data.history;
+				//this.requesthtml = response.data.html;
+				//this.history = response.data.history;
 			}
 		});
   }
@@ -42,21 +41,21 @@ export class RequestComponent {
   }
 
 	pendingrequest(){
-		if(this.requestdata.access=="pending"){
+		if(this.requestdata.pending==true){
 			return true;
 		}else{
 			return false;
 		}
 	}
 	approvedrequest(){
-		if(this.requestdata.access=="approved"){
+		if(this.requestdata.allow==true && this.requestdata.pending==false){
 			return true;
 		}else{
 			return false;
 		}
 	}
 	deniedrequest(){
-		if(this.requestdata.access=="denied"){
+		if(this.requestdata.allow==false && this.requestdata.pending==false){
 			return true;
 		}else{
 			return false;
@@ -64,21 +63,21 @@ export class RequestComponent {
 	}
 
 	pendingcompanyrequest(){
-		if(this.requestdata.companystatus=="pending" && this.requestdata.access != "denied"){
+		if(this.requestdata.companypending==true){
 			return true;
 		}else{
 			return false;
 		}
 	}
 	approvedcompanyrequest(){
-		if(this.requestdata.companystatus=="approved" && this.requestdata.access != "denied"){
+		if(this.requestdata.companyallow==true && this.requestdata.companypending==false){
 			return true;
 		}else{
 			return false;
 		}
 	}
 	deniedcompanyrequest(){
-		if(this.requestdata.companystatus=="denied" || this.requestdata.access == "denied"){
+		if((this.requestdata.companyallow==false && this.requestdata.companypending==false) || (this.requestdata.allow == false && this.requestdata.pending ==false)){
 			return true;
 		}else{
 			return false;
@@ -86,14 +85,14 @@ export class RequestComponent {
 	}
 	
 	approvedLookup(lookup){
-		if(lookup.access=="approved"){
+		if(lookup.allow == true && lookup.pending == false){
 			return true;
 		}else{
 			return false;
 		}
 	}
 	deniedLookup(lookup){
-		if(lookup.access== "denied"){
+		if(lookup.allow == false && lookup.pending ==false){
 			return true;
 		}else{
 			return false;
@@ -101,7 +100,7 @@ export class RequestComponent {
 	}
 	
 	displayButton(){
-		if(this.isAdmin() && this.requestdata.companystatus=="pending" && !this.requestdata.UCHandle){
+		if(this.isAdmin() && this.requestdata.companypending==true && !this.requestdata.UCHandle){
 			return true;
 		}else{
 			return false;
@@ -118,7 +117,8 @@ export class RequestComponent {
 		var vm = this;
 		this.modalService.showModal({}, modalOptions)
 			.then(function (result) {
-					 vm.requestdata.companystatus="approved";
+					 vm.requestdata.companyallow = true;
+					 vm.requestdata.companypending = false;
 			});
 	}
 	denyRequest(){
@@ -131,7 +131,8 @@ export class RequestComponent {
 		var vm = this;
 		this.modalService.showModal({}, modalOptions)
 			.then(function (result) {
-					 vm.requestdata.companystatus="denied";
+					 vm.requestdata.companyallow=false;
+					 vm.requestdata.companypending=false;
 			});
 
 	}
